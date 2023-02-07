@@ -46,7 +46,7 @@ With Sequential Layout Views, a container wrapper view enumerates over its arran
         .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
     )
 
-The code above is all that is needed to add views that layout in the content view and for the content view to calculate a size to fit its contents.
+The code above is all that is needed to add views that layout in the content view and for the content view to calculate a size to fit its contents.  In fact, containerLeftAlignedVStack is the default frame calculator, so the first two statements could be simplified further to a single line each.
 
 
 ## Use cases
