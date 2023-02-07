@@ -69,10 +69,10 @@ Lastly, defining spacing, sizing, and layouts via calculators allows greater fle
 
 ## Advanced topics
 
-* SQLayoutViews support nesting for more complex layouts
-* SQLayoutViews implement sizeThatFits:, returning a size that reflects the views laid out within via a dry layout pass
-* SQLayoutOptions calculators can customize behavior, such as skipping a subview when saving a "previous" reference for subsequent views.
-* SQLayoutContainer can be used to apply sequential layout to non-view based layout items, such a viewModels that precalculate subview frames before the views themselves are created
+* SQLayoutViews can be nested (one set as an arranged item of another) in order to support more complex layouts, such as centering a collection of variable-sized items.
+* SQLayoutOptions calculators can customize behavior, such as skipping a subview when saving a "previous" reference for subsequent views, or to omit a subview from layout when it should be hidden due to external conditions
+* SQLayoutContainer can be used to apply sequential layout to non-view based layout items, such a viewModels that precalculate subview frames before the views themselves are created.  When doing this, as "layoutObserver" can be used to capture and store the bounds calculated for each item during layout.
+* SQLayoutViews implement sizeThatFits:, returning a size that reflects the views laid out within via a dry layout pass.  Note that since sizeThatFits: is often called with one or both size dimensions set to CGFloat.max, it's important to keep this in mind when deciding how to layout subview items.  For instance, mixing a containerTopAligned calculator with a containerBottomAligned calculator will result in a calculated size always matching the fittingSize passed in (even if it is CGFloat.max).
 * SQLayoutViews are intended to be used in both swift and obj-c, but the latter has not yet been tested, so there may be some minor fixups needed
 * SQLayout will be moved into a proper framework in the future.
 
