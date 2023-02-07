@@ -1,5 +1,5 @@
 # SQLayout
-Sequential Layout Classes and Demo App For iOS  
+Sequential Layout Views and Demo App For iOS  
 Vince Lee  
 Feb 7, 2023  
 
@@ -9,7 +9,7 @@ Sequential Layout is system for laying out UIKit views using a declarative synta
 
 ## How it works
 
-Traditional layout code usually looks something like the following.  The views to layout are sequentially sized, then laid out, with a running offsets carried forward each successive view.  While this works, the endless cycle of sizing, offsetting, and setting of each view's frame ends up duplicating a lot of very similar code.
+Traditional layout code usually looks something like the following.  The views to layout are sized and laid out one at at time, with a running offsets carried forward each successive view.  While this works, the endless cycle of sizing, offsetting, and setting of each view's frame ends up duplicating a lot of very similar code.
 
     override func layoutSubviews() {
         super.layoutSubviews
@@ -25,7 +25,7 @@ Traditional layout code usually looks something like the following.  The views t
         ....
     }
 
-With Sequential Layout Views, a container wrapper view enumerates over its arranged subviews, which define their layout logic via "calculators" that are added as decorators of each view to define the layout, spacing, and insets.  Since layout logic is passed details about the container and the previous object laid out, they can usually be replaced with a set of premade standard calculators.  They can still be defined with custom code, however, or made by composing existing calculators.
+With Sequential Layout Views, a container wrapper view (SQLayoutView) contains one or more arrangedItems.  It enumerates over its arranged subviews when layoutSubviews is called, each of which define their layout logic via "calculators" that are added as decorators of each view.  These calculators define the layout, spacing, and insets of each view.  Since each calculator is passed the information it needs in a generic way, the calculators are usually reusable and can often replaced with a set of premade standard calculators defined in SQLayoutCalculators.  They can still be defined with custom code, however, or made by composing existing calculators to handle unique edge cases.
 
     let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
           
