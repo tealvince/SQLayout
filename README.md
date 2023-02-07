@@ -60,6 +60,13 @@ Similarly, handling optional subviews that appear or disappear is simpler, as th
 Lastly, defining spacing, sizing, and layouts via calculators allows greater flexibility to compute and adjust these parameters dynamically based on available space and external conditions, following a "set-it-and-forget-it" approach instead of having to recompute constraints when conditions change.
 
 
+## Advanced topics
+
+* SQLayoutViews support nesting
+* SQLayoutOptions calculators can customize behavior, such as skipping a subview when saving a "previous" reference for subsequent views.
+* SQLayoutContainer can be used to apply sequential layout to non-view based layout items, such a viewModels that precalculate subview frames before the views themselves are created
+* SQLayoutViews are intended to be used in both swift and obj-c, but the latter has not yet been tested, so there may be some minor fixups needed
+* SQLayout will be moved into a proper framework in the future.
 
 
 
