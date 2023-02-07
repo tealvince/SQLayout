@@ -1,7 +1,7 @@
 # SQLayout
-Sequential Layout System For iOS
-  Vince Lee
-  Feb 7, 2023
+Sequential Layout Classes and Demo App For iOS
+Vince Lee
+Feb 7, 2023
 
 -- THIS IS A WORK IN PROGRESS --
 
