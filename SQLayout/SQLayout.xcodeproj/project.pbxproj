@@ -12,9 +12,9 @@
 		560735DE2990C2C900097A3A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 560735DC2990C2C900097A3A /* Main.storyboard */; };
 		560735E02990C2CA00097A3A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 560735DF2990C2CA00097A3A /* Assets.xcassets */; };
 		560735E32990C2CA00097A3A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 560735E12990C2CA00097A3A /* LaunchScreen.storyboard */; };
-		560735EE2990C2CA00097A3A /* SLKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560735ED2990C2CA00097A3A /* SLKitTests.swift */; };
-		560735F82990C2CA00097A3A /* SLKitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560735F72990C2CA00097A3A /* SLKitUITests.swift */; };
-		560735FA2990C2CA00097A3A /* SLKitUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560735F92990C2CA00097A3A /* SLKitUITestsLaunchTests.swift */; };
+		560735EE2990C2CA00097A3A /* SQLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560735ED2990C2CA00097A3A /* SQLayoutTests.swift */; };
+		560735F82990C2CA00097A3A /* SQLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560735F72990C2CA00097A3A /* SQLayoutUITests.swift */; };
+		560735FA2990C2CA00097A3A /* SQLayoutUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560735F92990C2CA00097A3A /* SQLayoutUITestsLaunchTests.swift */; };
 		560736072990C4CB00097A3A /* SQLayoutItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560736062990C4CB00097A3A /* SQLayoutItem.swift */; };
 		56073609299173D600097A3A /* SQLayoutTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56073608299173D600097A3A /* SQLayoutTypes.swift */; };
 		5607360B2991834E00097A3A /* SQLayoutContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5607360A2991834E00097A3A /* SQLayoutContainer.swift */; };
@@ -48,10 +48,10 @@
 		560735E22990C2CA00097A3A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		560735E42990C2CA00097A3A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		560735E92990C2CA00097A3A /* SQLayoutTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SQLayoutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		560735ED2990C2CA00097A3A /* SLKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLKitTests.swift; sourceTree = "<group>"; };
+		560735ED2990C2CA00097A3A /* SQLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLayoutTests.swift; sourceTree = "<group>"; };
 		560735F32990C2CA00097A3A /* SQLayoutUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SQLayoutUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		560735F72990C2CA00097A3A /* SLKitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLKitUITests.swift; sourceTree = "<group>"; };
-		560735F92990C2CA00097A3A /* SLKitUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLKitUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		560735F72990C2CA00097A3A /* SQLayoutUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLayoutUITests.swift; sourceTree = "<group>"; };
+		560735F92990C2CA00097A3A /* SQLayoutUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLayoutUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		560736062990C4CB00097A3A /* SQLayoutItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLayoutItem.swift; sourceTree = "<group>"; };
 		56073608299173D600097A3A /* SQLayoutTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLayoutTypes.swift; sourceTree = "<group>"; };
 		5607360A2991834E00097A3A /* SQLayoutContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLayoutContainer.swift; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 		560735EC2990C2CA00097A3A /* SQLayoutTests */ = {
 			isa = PBXGroup;
 			children = (
-				560735ED2990C2CA00097A3A /* SLKitTests.swift */,
+				560735ED2990C2CA00097A3A /* SQLayoutTests.swift */,
 			);
 			path = SQLayoutTests;
 			sourceTree = "<group>";
@@ -129,8 +129,8 @@
 		560735F62990C2CA00097A3A /* SQLayoutUITests */ = {
 			isa = PBXGroup;
 			children = (
-				560735F72990C2CA00097A3A /* SLKitUITests.swift */,
-				560735F92990C2CA00097A3A /* SLKitUITestsLaunchTests.swift */,
+				560735F72990C2CA00097A3A /* SQLayoutUITests.swift */,
+				560735F92990C2CA00097A3A /* SQLayoutUITestsLaunchTests.swift */,
 			);
 			path = SQLayoutUITests;
 			sourceTree = "<group>";
@@ -292,7 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				560735EE2990C2CA00097A3A /* SLKitTests.swift in Sources */,
+				560735EE2990C2CA00097A3A /* SQLayoutTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,8 +300,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				560735FA2990C2CA00097A3A /* SLKitUITestsLaunchTests.swift in Sources */,
-				560735F82990C2CA00097A3A /* SLKitUITests.swift in Sources */,
+				560735FA2990C2CA00097A3A /* SQLayoutUITestsLaunchTests.swift in Sources */,
+				560735F82990C2CA00097A3A /* SQLayoutUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -463,7 +463,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2A5HS96N6K;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = SLKit/Info.plist;
+				INFOPLIST_FILE = TestApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -491,7 +491,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2A5HS96N6K;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = SLKit/Info.plist;
+				INFOPLIST_FILE = TestApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
