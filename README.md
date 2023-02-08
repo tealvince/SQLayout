@@ -91,5 +91,34 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
 
 * Options calculator - returns values to make adjusments to layout behavior, often in response to external conditions.  Values include shouldSkipLayout (item is ignored as if it wasn't an arranged item), shouldIgnoreWhenCalculatingSize (item is laid out but not counted in the "occupied bounds" check that determines the calculated size of the view container), or saveAsPrevious (if false, the "previous" reference passed to the next item during layout isn't updated to reflect the current item so the next item sees the same "previous" item as us).
 
-* layoutObserver - called when item layout has been performed on an arranged item.  For views, setFrame is called with the frame value passed in.  For sequential layout with non-view based items and containers, this can be used to store off a calculated view frame into a view model or other layoutState object for later use.
+* layoutObserver - called when item layout has been performed on an arranged item.  For view-based items, the default implementation calls setFrame with the frame value passed in.  For sequential layout with non-view based items and containers, this can be used to store off a calculated view frame into a view model or other layoutState object for later use.
+
+## Example
+
+    // Create a layout view and add it as an autosized subview 
+    // of our view (can also just create the view and do the rest manually):
+
+    let contentView = SQLayoutView.contentView(addedTo: self.view, layoutInsets: .zero)
+
+    // Add titleLabel and subtitleLabel view to our content view and 
+    // have them stack vertically at the top using the default frame
+    // calculator:
+
+    contentView.addArrangedItem(titleLabel)
+    contentView.addArrangedItem(subtitleLabel)
+
+    // Add an action button, but have it expanded to the full width 
+    // of the content view instead of left-aligned at the intrinsic width
+
+    contentView.addArrangedItem(actionButton
+        .withSQFrameCalculator(SQLayoutCalculators.containerFullWidthVStack)
+    }
+
+    // Add a footer label, centered in the parent view with some 
+    // additional spacing on top
+
+    contentView.addArrangedItem(footerLabel
+        .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
+        .withSQContentSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
+    }
 
