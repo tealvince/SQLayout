@@ -3,6 +3,7 @@ Sequential Layout Views and Demo App For iOS
 Vince Lee  
 Feb 7, 2023  
 
+
 -- THIS IS A WORK IN PROGRESS --
 
 Sequential Layout is system for laying out UIKit views using a declarative syntax that is highly readable and encourages code reuse.  It breaks out the code normally used to manually size and layout views into blocks that are attached as decorators to arranged subviews.  These blocks retain all the flexibility of manual layout while encouraging reuse that simplifies and accelerates development.
