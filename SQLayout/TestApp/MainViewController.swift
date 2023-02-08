@@ -9,146 +9,130 @@ import UIKit
 
 class MainViewController: UIViewController {
 
+    // Create a label as a test view
+    private func testView(_ s: String, _ col: UIColor) -> UIView {
+        let view = UILabel()
+        view.text = s
+        view.backgroundColor = col
+        return view
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.white
 
-        // Define and add content view
+        // Create and add content view
         let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide, layoutInsets: UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20))
 
-        // Add title (defaults to left-aligned vstack layout)
+        // Create title label
         let titleLabel = UILabel()
         titleLabel.text = "SQLayout Test"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 30)
+
+        // Add as sequential layout item (defaults to left-aligned vstack layout)
         contentView.addArrangedItem(titleLabel)
 
-        // Add an auto-sized wrapper to demonstrate nesting
+        // Create wrapper
         let wrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
         wrapper.layer.cornerRadius = 10
         wrapper.backgroundColor = UIColor.lightGray
+        
+        // Add as auto-sized nested layout wrapper view
         contentView.addArrangedItem(wrapper
             .withSQFrameCalculator(SQLayoutCalculators.containerCenterAligned)
         )
 
-        func testView(_ s: String, _ col: UIColor) -> UIView {
-            let view = UILabel()
-            view.text = s
-            view.backgroundColor = col
-            return view
-        }
-        
         // Fill it with a bunch of arranged views to test various layout calculators
-        let view1 = testView("container-center", UIColor.red)
-        let view2 = testView("right-aligned", UIColor.green)
-        let view3 = testView("left-aligned", UIColor.blue)
-        let view4 = testView("center", UIColor.orange)
-        let view5 = testView("container-right-aligned", UIColor.green)
-        let view6 = testView("container-left-aligned", UIColor.blue)
-        let view7 = testView("container-center", UIColor.orange)
-        let view8 = testView("container full width", UIColor.purple)
-        let view9 = testView("flow short", UIColor.magenta)
-        let view10 = testView("flow longer", UIColor.magenta)
-        let view11 = testView("flow longest", UIColor.magenta)
-        let view12 = testView("flow middle", UIColor.magenta)
-        let view13 = testView("hub", UIColor.yellow)
-        let view14 = testView("leaf", UIColor.red)
-        let view15 = testView("leaf", UIColor.red)
-        let view16 = testView("leaf", UIColor.red)
-        let view17 = testView("leaf", UIColor.red)
-        let view18 = testView("leaf", UIColor.red)
-        let view19 = testView("leaf", UIColor.red)
-        let view20 = testView("leaf", UIColor.red)
-        let view21 = testView("leaf", UIColor.red)
-        let view22 = testView("bottom-left", UIColor.green)
-        let view23 = testView("bottom-right", UIColor.green)
-
-        wrapper.addArrangedItem(view1
+        // Each line simply adds a test view, decorating it with any calculators to
+        // define/customize its layout
+        
+        wrapper.addArrangedItem(testView("container-center", UIColor.orange)
             .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
         )
-        wrapper.addArrangedItem(view2
+        wrapper.addArrangedItem(testView("right-aligned", UIColor.darkGray)
             .withSQFrameCalculator(SQLayoutCalculators.rightAlignedVStack)
         )
-        wrapper.addArrangedItem(view3
+        wrapper.addArrangedItem(testView("left-aligned", UIColor.darkGray)
             .withSQFrameCalculator(SQLayoutCalculators.leftAlignedVStack)
         )
-        wrapper.addArrangedItem(view4
+        wrapper.addArrangedItem(testView("center", UIColor.darkGray)
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedVStack)
         )
-        wrapper.addArrangedItem(view5
+        wrapper.addArrangedItem(testView("container-right-aligned", UIColor.orange)
             .withSQFrameCalculator(SQLayoutCalculators.containerRightAlignedVStack)
         )
-        wrapper.addArrangedItem(view6
+        wrapper.addArrangedItem(testView("container-left-aligned", UIColor.orange)
             .withSQFrameCalculator(SQLayoutCalculators.containerLeftAlignedVStack)
         )
-        wrapper.addArrangedItem(view7
+        wrapper.addArrangedItem(testView("container-center", UIColor.orange)
             .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
         )
-        wrapper.addArrangedItem(view8
+        wrapper.addArrangedItem(testView("container full width", UIColor.orange)
             .withSQFrameCalculator(SQLayoutCalculators.containerWidthVStack)
         )
-        wrapper.addArrangedItem(view9
+        wrapper.addArrangedItem(testView("flow short", UIColor.green)
             .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
         )
-        wrapper.addArrangedItem(view10
+        wrapper.addArrangedItem(testView("flow longer", UIColor.green)
             .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
         )
-        wrapper.addArrangedItem(view11
+        wrapper.addArrangedItem(testView("flow longest", UIColor.green)
             .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
         )
         
         // Content spacing examples
         
-        wrapper.addArrangedItem(view12
+        wrapper.addArrangedItem(testView("flow middle", UIColor.green)
             .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
             .withSQContentSpacing(UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0))
         )
-        wrapper.addArrangedItem(view13
+        wrapper.addArrangedItem(testView("hub", UIColor.yellow)
             .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
             .withSQContentSpacing(UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20))
         )
 
         // NoPrevious option examples
         
-        wrapper.addArrangedItem(view14
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedVStackUp)
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view15
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedVStack)
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view16
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view17
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedHStackLeft)
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         
         // Frame calculator composition examples
         
-        wrapper.addArrangedItem(view18
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStackUp(args), -40, 10) }
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view19
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStackUp(args), 40, 10) }
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view20
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStack(args), -40, -10) }
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view21
+        wrapper.addArrangedItem(testView("leaf", UIColor.red)
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStack(args), 40, -10) }
             .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        wrapper.addArrangedItem(view22
+        wrapper.addArrangedItem(testView("bottom-left", UIColor.darkGray)
             .withSQFrameCalculator(SQLayoutCalculators.containerBottomLeftAligned)
             .withSQLayoutOptions(SQLayoutOptions(shouldIgnoreWhenCalculatingSize: true))
         )
-        wrapper.addArrangedItem(view23
+        wrapper.addArrangedItem(testView("bottom-right", UIColor.darkGray)
             .withSQFrameCalculator(SQLayoutCalculators.containerBottomRightAligned)
             .withSQLayoutOptions(SQLayoutOptions(shouldIgnoreWhenCalculatingSize: true))
         )
