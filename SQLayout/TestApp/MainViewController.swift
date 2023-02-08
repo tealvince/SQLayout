@@ -18,7 +18,7 @@ class MainViewController: UIViewController {
 
         // Add an auto-sized wrapper
         let wrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
-        wrapper.backgroundColor = UIColor.yellow
+        wrapper.backgroundColor = UIColor.lightGray
         contentView.addArrangedItem(wrapper)
         
         func testView(_ s: String, _ col: UIColor) -> UIView {
@@ -50,6 +50,8 @@ class MainViewController: UIViewController {
         let view19 = testView("leaf", UIColor.red)
         let view20 = testView("leaf", UIColor.red)
         let view21 = testView("leaf", UIColor.red)
+        let view22 = testView("bottom-left", UIColor.green)
+        let view23 = testView("bottom-right", UIColor.green)
 
         wrapper.addArrangedItem(view1
             .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
@@ -100,38 +102,46 @@ class MainViewController: UIViewController {
         
         wrapper.addArrangedItem(view14
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedVStackUp)
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         wrapper.addArrangedItem(view15
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedVStack)
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         wrapper.addArrangedItem(view16
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         wrapper.addArrangedItem(view17
             .withSQFrameCalculator(SQLayoutCalculators.centerAlignedHStackLeft)
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         
         // Frame calculator composition examples
         
         wrapper.addArrangedItem(view18
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStackUp(args), -40, 10) }
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         wrapper.addArrangedItem(view19
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStackUp(args), 40, 10) }
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         wrapper.addArrangedItem(view20
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStack(args), -40, -10) }
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         wrapper.addArrangedItem(view21
             .withSQFrameCalculator { args in CGRectOffset(SQLayoutCalculators.centerAlignedVStack(args), 40, -10) }
-            .withSQLayoutOptionsCalculator { _ in SQLayoutOptions(saveAsPrevious: false) }
+            .withSQLayoutOptions(SQLayoutOptions(saveAsPrevious: false))
+        )
+        wrapper.addArrangedItem(view22
+            .withSQFrameCalculator(SQLayoutCalculators.containerBottomLeftAligned)
+            .withSQLayoutOptions(SQLayoutOptions(shouldIgnoreWhenCalculatingSize: true))
+        )
+        wrapper.addArrangedItem(view23
+            .withSQFrameCalculator(SQLayoutCalculators.containerBottomRightAligned)
+            .withSQLayoutOptions(SQLayoutOptions(shouldIgnoreWhenCalculatingSize: true))
         )
     }
 }
