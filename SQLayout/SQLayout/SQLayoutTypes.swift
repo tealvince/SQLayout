@@ -16,7 +16,7 @@ import UIKit
 ///
 
 /// Describes options that affect layout
-@objc
+@objcMembers
 public class SQLayoutOptions: NSObject {
     /// When true, this object is ignored during layout
     let shouldSkipLayout: Bool
@@ -38,7 +38,7 @@ public class SQLayoutOptions: NSObject {
 }
 
 /// Describes the layout container that an item is being asked to layout inside
-@objc
+@objcMembers
 public class SQContainerDescription: NSObject {
     let layoutBounds: CGRect
     let layoutInsets: UIEdgeInsets
@@ -49,7 +49,7 @@ public class SQContainerDescription: NSObject {
 }
 
 /// Describes the previous item laid out during the sequential layout process
-@objc
+@objcMembers
 public class SQPreviousItemDescription: NSObject {
     let item: SQLayoutItem
     let contentBounds: CGRect
@@ -64,7 +64,7 @@ public class SQPreviousItemDescription: NSObject {
 }
 
 /// Arguments passed to size calculators
-@objc
+@objcMembers
 public class SQSizeCalculatorArgs: NSObject {
     let item: SQLayoutItem
     let container: SQContainerDescription
@@ -77,7 +77,7 @@ public class SQSizeCalculatorArgs: NSObject {
 }
 
 /// Arguments passed to frame calculators
-@objc
+@objcMembers
 public class SQFrameCalculatorArgs: NSObject {
     let item: SQLayoutItem
     let contentPadding: UIEdgeInsets
@@ -96,7 +96,7 @@ public class SQFrameCalculatorArgs: NSObject {
 }
 
 /// Arguments passed to ContentSpacing calculators
-@objc
+@objcMembers
 public class SQContentSpacingCalculatorArgs: NSObject {
     let item: SQLayoutItem
     let container: SQContainerDescription
@@ -107,7 +107,7 @@ public class SQContentSpacingCalculatorArgs: NSObject {
 }
 
 /// Arguments passed ContentPadding calculators
-@objc
+@objcMembers
 public class SQContentPaddingCalculatorArgs: NSObject {
     let item: SQLayoutItem
     let container: SQContainerDescription
@@ -118,7 +118,7 @@ public class SQContentPaddingCalculatorArgs: NSObject {
 }
 
 /// Arguments passed LayoutOptions calculators
-@objc
+@objcMembers
 public class SQLayoutOptionsCalculatorArgs: NSObject {
     let item: SQLayoutItem
     let container: SQContainerDescription
@@ -129,7 +129,7 @@ public class SQLayoutOptionsCalculatorArgs: NSObject {
 }
 
 /// Arguments passed to Layout observers
-@objc
+@objcMembers
 public class SQLayoutObserverArgs: NSObject {
     let item: SQLayoutItem
     let frame: CGRect

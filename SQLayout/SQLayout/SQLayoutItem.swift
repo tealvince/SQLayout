@@ -27,7 +27,7 @@ public protocol SQLayoutItem {
 ///
 /// A wrapper object used to add sequential layout support and mutability to wrapped objects.
 ///
-@objc
+@objcMembers
 public class SQMutableProxyLayoutItem: NSObject, SQLayoutItem {
     
     // MARK: - SQLayoutItem
@@ -62,6 +62,7 @@ public class SQMutableProxyLayoutItem: NSObject, SQLayoutItem {
 ///     .withSQSizeCalculator({...})
 ///     .withSQContentSpacingCalculator({...})
 ///
+@objc
 public extension NSObject {
 
     // MARK: - Public Decorators (closures)

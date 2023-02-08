@@ -10,7 +10,7 @@ import UIKit
 ///
 /// Class that performs layout for arranged items
 ///
-@objc
+@objcMembers
 public class SQLayoutContainer: NSObject {
     public var arrangedItems: [SQLayoutItem] = []
 

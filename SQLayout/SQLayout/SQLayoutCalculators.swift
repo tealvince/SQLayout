@@ -11,7 +11,8 @@ import UIKit
 /// An assortment of useful reusable convenience frame calculators.
 /// Can often be used instead of defining a custom calculator for an item.
 ///
-public class SQLayoutCalculators {
+@objcMembers
+public class SQLayoutCalculators: NSObject {
     
     // MARK: - Public (origin)
     
