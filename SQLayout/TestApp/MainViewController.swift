@@ -16,11 +16,20 @@ class MainViewController: UIViewController {
         // Define and add content view
         let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide, layoutInsets: UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20))
 
-        // Add an auto-sized wrapper
+        // Add title (defaults to left-aligned vstack layout)
+        let titleLabel = UILabel()
+        titleLabel.text = "SQLayout Test"
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 30)
+        contentView.addArrangedItem(titleLabel)
+
+        // Add an auto-sized wrapper to demonstrate nesting
         let wrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
+        wrapper.layer.cornerRadius = 10
         wrapper.backgroundColor = UIColor.lightGray
-        contentView.addArrangedItem(wrapper)
-        
+        contentView.addArrangedItem(wrapper
+            .withSQFrameCalculator(SQLayoutCalculators.containerCenterAligned)
+        )
+
         func testView(_ s: String, _ col: UIColor) -> UIView {
             let view = UILabel()
             view.text = s
@@ -91,7 +100,7 @@ class MainViewController: UIViewController {
         
         wrapper.addArrangedItem(view12
             .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
-            .withSQContentSpacing(UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0))
+            .withSQContentSpacing(UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0))
         )
         wrapper.addArrangedItem(view13
             .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)

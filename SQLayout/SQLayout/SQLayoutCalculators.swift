@@ -364,8 +364,19 @@ public class SQLayoutCalculators {
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
     
-    // MARK: - Public (Corner aligned)
+    // MARK: - Public (Corner/Center aligned)
     
+    /// `┌────────────────────────────┐
+    /// `│                            │
+    /// `│         ┌───────┐          │
+    /// `│         │ curr  │          │
+    /// `│         └───────┘          │
+    /// `│                            │
+    /// `└────────────────────────────┘
+    static func containerCenterAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterY(args, rect: alignToContainerCenterX(args, rect: origin(args)))
+    }
+
     /// `┌────────────────────────────┐
     /// `│  ┌───────┐                 │
     /// `│  │ curr  │                 │
@@ -409,7 +420,20 @@ public class SQLayoutCalculators {
     static func containerBottomRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToContainerBottom(args, rect: alignToContainerRight(args, rect: origin(args)))
     }
-    
+
+    /// `┌────────────────────────────┐
+    /// `│                            │
+    /// `│  ┌──────────┐              │
+    /// `│  │ ┌──────┐ │              │
+    /// `│  │ │ curr │ │              │
+    /// `│  │ └──────┘ │ prev         │
+    /// `│  └──────────┘              │
+    /// `│                            │
+    /// `└────────────────────────────┘
+    static func centerAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: alignToPreviousCenterX(args, rect: origin(args)))
+    }
+
     /// `┌────────────────────────────┐
     /// `│  ┌───────┐─┐               │
     /// `│  │ curr  │ │               │
