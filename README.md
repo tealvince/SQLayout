@@ -77,5 +77,19 @@ Lastly, defining spacing, sizing, and layouts via calculators allows greater fle
 * SQLayoutViews are intended to be used in both swift and obj-c, but the latter has not yet been tested, so there may be some minor fixups needed
 * SQLayout will be moved into a proper framework in the future.
 
+## Decorators
 
+Layout items (usually subviews) can be "decorated" by using a .withSQxxx() method to attach additional information about how the view should be laid out.  While layout items have default behavior and decorators are all optional, adding them allows one to customized the layout.
+
+* Frame calculator - given information about the bounds of the containing view and the subview previously laid out, a frame calculator does the work of layout and returns the frame after layout.  For many use cases, a predefined calculator in SQLayoutCalculators can be used as is.
+
+* Size calculator - returns the size for a view given a size to fit into.  This is used by some frame calculators to get the intrinsic height, width, or both values for an item.  By default, view items call sizeThatFits, which is sufficient for many view types.
+
+* Content spacing calculator - returns the minimum spacing requested between the current object and previous/next objects during layout.  Defined as a UIEdgeInset, calculators use the appropriate pair of insets (e.g. top/bottom, left/right) between two views and adjust spacing so that both views get at least the minimum spacing between them in the relevant paired directions.
+
+* Content padding calculator - content padding simply informs calculators to adjust a frame's position so that extra empty space is added both from a previous/next object and container bounds.  Unlike content spacing, padding is always additive regardless of whether a previous/next object has its own padding.  Padding can be negative to eliminate empty space within a subview, such as the inset around a UITextView or borderless UIButton.  Properly written frame calculators also adjust for padding in the fittingSize passed to a size calculator.
+
+* Options calculator - returns values to make adjusments to layout behavior, often in response to external conditions.  Values include shouldSkipLayout (item is ignored as if it wasn't an arranged item), shouldIgnoreWhenCalculatingSize (item is laid out but not counted in the "occupied bounds" check that determines the calculated size of the view container), or saveAsPrevious (if false, the "previous" reference passed to the next item during layout isn't updated to reflect the current item so the next item sees the same "previous" item as us).
+
+* layoutObserver - called when item layout has been performed on an arranged item.  For views, setFrame is called with the frame value passed in.  For sequential layout with non-view based items and containers, this can be used to store off a calculated view frame into a view model or other layoutState object for later use.
 
