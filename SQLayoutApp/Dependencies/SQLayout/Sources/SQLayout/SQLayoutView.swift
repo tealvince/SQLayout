@@ -12,6 +12,17 @@ public typealias SQLayoutViewInsetsCalculator = (SQLayoutView) -> UIEdgeInsets
 ///
 /// A container view that supports sequential layout on subviews
 ///
+/// ````
+/// ┌────────────────────────────┐
+/// │  ┌──────────────────────┐  │
+/// │  │                      │ ──────── Layout Insets
+/// │  │                      │  │
+/// │  │ Layout items go here │  │──── Layout Bounds
+/// │  │                      │  │
+/// │  │                      │  │
+/// │  └──────────────────────┘  │
+/// └────────────────────────────┘
+///
 @objcMembers
 public class SQLayoutView: UIView {
     // MARK: - Public properties
@@ -20,8 +31,6 @@ public class SQLayoutView: UIView {
 
     // MARK: - Private properties
     let container = SQLayoutContainer()
-    let maxAutosizingOffsetX: CGFloat = 100
-    let maxAutosizingOffsetY: CGFloat = 100
 
     // MARK: - Factory methods
     
@@ -77,8 +86,9 @@ public class SQLayoutView: UIView {
     ///
     /// Add an item (typically a raw or decorated UIView), as an arranged item.
     /// If the item represents a view then add it as a subview as well.
-    ///
-    public func addArrangedItem(_ item: SQLayoutItem) {
+    /// Returns self to support chaining.
+    @discardableResult
+    public func addArrangedItem(_ item: SQLayoutItem) -> SQLayoutView {
         
         // Add item to container
         container.arrangedItems.append(item)
@@ -88,6 +98,7 @@ public class SQLayoutView: UIView {
             self.addSubview(subview)
         }
         setNeedsLayout()
+        return self
     }
     
     ///
@@ -144,19 +155,9 @@ public class SQLayoutView: UIView {
     public override func sizeThatFits(_ size: CGSize) -> CGSize {
         // Call container to get rectangle occupied by items during layout pass
         let layoutBounds = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, size.width, size.height)
-        var occupiedBounds = container.layoutItems(in: layoutBounds, with: layoutInsets, forSizingOnly: true)
-        
-        // Sizing is typically called with a large height or width (e.g. CGFloat.max)
-        // to get the ideal size that a view wants to be.  If our items are center, right,
-        // or bottom-aligned, however, the origin of the occupied bounds is meaninglessly
-        // large and we should align the content to the top/left content insets instead.
-        if occupiedBounds.origin.x > maxAutosizingOffsetX {
-            occupiedBounds.origin.x = layoutInsets.left
-        }
-        if occupiedBounds.origin.y > maxAutosizingOffsetY {
-            occupiedBounds.origin.y = layoutInsets.top
-        }
-        
-        return CGSizeMake(CGRectGetMaxX(occupiedBounds) + layoutInsets.right, CGRectGetMaxY(occupiedBounds) + layoutInsets.bottom)
+        let occupiedBounds = container.layoutItems(in: layoutBounds, with: layoutInsets, forSizingOnly: true)
+
+        // Return smallest size that will contain all the laid out items within the layout insets        
+        return CGSizeMake(layoutInsets.left + CGRectGetWidth(occupiedBounds) + layoutInsets.right, layoutInsets.top + CGRectGetHeight(occupiedBounds) + layoutInsets.bottom)
     }
 }

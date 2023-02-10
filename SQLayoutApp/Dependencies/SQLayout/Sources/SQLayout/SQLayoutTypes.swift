@@ -30,7 +30,7 @@ public class SQLayoutOptions: NSObject {
     /// If false, the next layout item will not see us as the "previous" item
     /// This option is useful to layout multiple leaves relative to a common previous node.
     let saveAsPrevious: Bool
-    init(shouldSkipLayout: Bool = false, shouldIgnoreWhenCalculatingSize: Bool = false, saveAsPrevious: Bool = true) {
+    public init(shouldSkipLayout: Bool = false, shouldIgnoreWhenCalculatingSize: Bool = false, saveAsPrevious: Bool = true) {
         self.shouldSkipLayout = shouldSkipLayout
         self.shouldIgnoreWhenCalculatingSize = shouldIgnoreWhenCalculatingSize
         self.saveAsPrevious = saveAsPrevious

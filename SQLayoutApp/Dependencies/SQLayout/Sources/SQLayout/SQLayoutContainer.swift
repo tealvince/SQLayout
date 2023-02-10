@@ -8,7 +8,23 @@
 import UIKit
 
 ///
-/// Class that performs layout for arranged items
+/// Class that performs layout for arranged items and returns the
+/// "occupied bounds" of the laid out objects
+///
+/// ````
+/// ┌──────────────────────────────┐
+/// │  ┌────────────────────────┐  │
+/// │  │ ┌────┐─────────────┐   │  │
+/// │  │ │    │             │────────── Occupied bounds
+/// │  │ │    │        ┌────┐   │  │
+/// │  │ └────┘        │    │   │ ───── Layout insets
+/// │  │ │             └────┘   │  │
+/// │  │ │   ┌──────┐       │   │  │─── Layout bounds
+/// │  │ └───└──────┘───────┘   │  │
+/// │  │                        │  │
+/// │  │                        │  │
+/// │  └────────────────────────┘  │
+/// └──────────────────────────────┘
 ///
 @objcMembers
 public class SQLayoutContainer: NSObject {
@@ -33,13 +49,18 @@ public class SQLayoutContainer: NSObject {
 
             // Call layout observer with generated frame
             item.sq_layoutObserver(SQLayoutObserverArgs(item: item, frame: frame, forSizingOnly: forSizingOnly))
-            
+
             // Update occupied bounds
             if !options.shouldIgnoreWhenCalculatingSize {
+                let occupiedFrame = CGRectMake(
+                    CGRectGetMinX(frame) - contentPadding.left,
+                    CGRectGetMinY(frame) - contentPadding.top,
+                    CGRectGetWidth(frame) + contentPadding.left + contentPadding.right,
+                    CGRectGetHeight(frame) + contentPadding.top + contentPadding.bottom)
                 if occupiedBounds.isEmpty {
-                    occupiedBounds = frame
+                    occupiedBounds = occupiedFrame
                 } else if !frame.isEmpty {
-                    occupiedBounds = CGRectUnion(occupiedBounds, frame)
+                    occupiedBounds = CGRectUnion(occupiedBounds, occupiedFrame)
                 }
             }
             
