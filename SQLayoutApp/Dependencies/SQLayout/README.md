@@ -155,7 +155,7 @@ The code above is spaced out to describe each step individually.  Alternatively,
         )
         .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
     
-Now let's say we want to support multiple action buttons, and have the centered horizontally in the container view.  Since centering a group along the same axis we are adding them cannot be done sequentially, we can wrap the group in another layout view to accomplish this:
+Now let's say we want to support multiple action buttons, and have the row of them centered horizontally in the container view.  Since centering a group along the same axis we are adding them cannot be done sequentially, we can wrap the group in another layout view to accomplish this:
 
     let layoutView = SQLayoutView.autosizedView(addedTo: self.view, layoutInsets: .zero)
         .containingArrangedItem(titleLabel)
