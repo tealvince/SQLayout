@@ -39,7 +39,7 @@ public protocol SQMutableLayoutItem: SQLayoutItem {
 }
 
 ///
-/// A wrapper object used to add sequential layout support and mutability to wrapped objects.
+/// A wrapper object used to store mutable decorator customizations added to wrapped objects.
 ///
 @objcMembers
 public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
@@ -47,13 +47,6 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
     // MARK: - Initializer
     init(rootItem: NSObject) {
         self.mutable_sq_rootItem = rootItem.sq_rootItem ?? rootItem
-        self.mutable_sq_sizeCalculator = rootItem.sq_sizeCalculator
-        self.mutable_sq_frameCalculator = rootItem.sq_frameCalculator
-        self.mutable_sq_sizingFrameCalculator = rootItem.sq_sizingFrameCalculator
-        self.mutable_sq_spacingCalculator = rootItem.sq_spacingCalculator
-        self.mutable_sq_paddingCalculator = rootItem.sq_paddingCalculator
-        self.mutable_sq_layoutOptionsCalculator = rootItem.sq_layoutOptionsCalculator
-        self.mutable_sq_layoutObserver = rootItem.sq_layoutObserver
     }
     
     // MARK: - SQMutableLayoutItem
@@ -66,7 +59,7 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
     public var mutable_sq_layoutOptionsCalculator: SQLayoutOptionsCalculator?
     public var mutable_sq_layoutObserver: SQLayoutObserver?
         
-    // MARK: - SQMutableLayoutItem
+    // MARK: - SQLayoutItem
     override public var sq_rootItem: NSObject? { mutable_sq_rootItem }
     override public var sq_sizeCalculator: SQSizeCalculator?
         { mutable_sq_sizeCalculator ?? mutable_sq_rootItem?.sq_sizeCalculator }

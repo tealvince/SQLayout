@@ -76,6 +76,8 @@ In addition to providing a readable alternative to manual layout, Sequential Lay
 
 * Objective C - supports Objective-C
 
+* Handles wrapped text - passes down bounding sizes naturally in nested view hierarchies, avoiding the need to manually calculate and update preferredMaxLayoutWidth in order to support multiline text items.
+
 * Dynamic calculation - All spacing, sizing, and insets are customizable with calculator blocks, not constants, allowing dynamic behavior to be setup in advance, avoiding the need to constantly recalculate contraints when conditions change.
 
 * Modularity - Frame calculators are structured to maximize reusabilty, and indeed the framework includes a library of commonly used calculators that can be used directly or composed to handle most use cases.
