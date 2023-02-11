@@ -155,6 +155,26 @@ The code above is spaced out to describe each step individually.  Alternatively,
         )
         .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
     
+Now let's say we want to support multiple action buttons, and have the centered horizontally in the container view.  Since centering a group along the same axis we are adding them cannot be done sequentially, we can wrap the group in another layout view to accomplish this:
+
+    let layoutView = SQLayoutView.autosizedView(addedTo: self.view, layoutInsets: .zero)
+        .containingArrangedItem(titleLabel)
+        .containingArrangedItem(subtitleLabel)
+        .containingArrangedItem(SQLayoutView()
+            .containingArrangedItem(actionButton1)
+            .containingArrangedItem(actionButton2)
+            .containingArrangedItem(actionButton3)
+            .containingDefaultFrameCalculator(SQLayoutCalculators.topAlignedHStack)
+            .containingDefaultSpacing(UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10))
+            .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
+        )
+        .containingArrangedItem(footerLabel
+            .withSQFrameCalculator(SQLayoutCalculators.containerCenterAlignedVStack)
+            .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
+        )
+        .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+
+Note that the "with...()" decorator methods can be applied to any layoutItem and determine their layout inside an enclosing layoutView, while the "containing...()" methods only apply to the layoutView containers themselves and set defaults for all layoutItems inside.  In this example, the buttons are wrapped by a layoutView that is itself also a layoutItem, so it has both "with..." and "containing..." methods called on it.
   
 ## Advanced topics
 
