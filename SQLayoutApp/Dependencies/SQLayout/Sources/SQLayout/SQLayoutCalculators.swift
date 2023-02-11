@@ -28,7 +28,7 @@ public class SQLayoutCalculators: NSObject {
     ///
     public static func origin(_ args: SQFrameCalculatorArgs) -> CGRect {
         let fittingSize = itemFittingSizeForContainer(args.container, padding: args.contentPadding)
-        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
         
         return CGRectMake(0, 0, size.width, size.height)
     }
@@ -572,7 +572,7 @@ public class SQLayoutCalculators: NSObject {
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
 
         let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
-        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
         return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, r - l - args.contentPadding.left - args.contentPadding.right, size.height)
     }
 
@@ -585,7 +585,7 @@ public class SQLayoutCalculators: NSObject {
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
 
         let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
-        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
         return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, r - l - args.contentPadding.left - args.contentPadding.right, size.height)
     }
 
@@ -610,7 +610,7 @@ public class SQLayoutCalculators: NSObject {
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
 
         let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
-        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
         return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, size.width, b - t - args.contentPadding.top - args.contentPadding.bottom)
     }
 
@@ -623,7 +623,7 @@ public class SQLayoutCalculators: NSObject {
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
 
         let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
-        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
         return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, size.width, b - t - args.contentPadding.top - args.contentPadding.bottom)
     }
 

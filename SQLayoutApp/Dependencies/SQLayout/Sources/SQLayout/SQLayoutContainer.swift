@@ -28,10 +28,12 @@ import UIKit
 ///
 @objcMembers
 public class SQLayoutContainer: NSObject {
-    static var nestLevel = 0
+    public static var debugEnabled = false
+    private static var nestLevel = 0
+    
     public var arrangedItems: [SQLayoutItem] = []
     public let maxDimension: CGFloat = 10000    // clip fitting sizes to reasonable values to prevent overflows
-    
+
     // Lays out all arranged items and returns the bounding
     // rectangle that contains all of their content rects.
     @discardableResult
@@ -44,25 +46,30 @@ public class SQLayoutContainer: NSObject {
         let container = SQContainerDescription(layoutBounds: bounds, layoutInsets: insets)
         var previous: SQPreviousItemDescription?
         var occupiedBounds = CGRect.zero
-
-        SQLayoutContainer.nestLevel += 1
-        let debugPrefix = String(Array(repeating: " ", count: SQLayoutContainer.nestLevel * 3))
-        print("\(debugPrefix)Layout container: bounds=\(bounds) inset=\(insets)")
+        var debugPrefix = ""
+        
+        if SQLayoutContainer.debugEnabled {
+            SQLayoutContainer.nestLevel += 1
+            debugPrefix = String(Array(repeating: " ", count: SQLayoutContainer.nestLevel * 3))
+            print("\(debugPrefix)Layout container: bounds=\(bounds) inset=\(insets)")
+        }
         
         for item in arrangedItems {
-            let options = item.sq_layoutOptionsCalculator(SQLayoutOptionsCalculatorArgs(item: item, container: container))
+            let options = item.sq_layoutOptionsCalculator?(SQLayoutOptionsCalculatorArgs(item: item, container: container)) ?? SQLayoutOptions()
             
             guard !options.shouldSkipLayout else { continue }
 
-            print("\(debugPrefix)   ┌─ item: \(String(describing: item.sq_rootItem))")
-            SQLayoutContainer.nestLevel += 1
-
-            let contentSpacing = item.sq_contentSpacingCalculator(SQContentSpacingCalculatorArgs(item: item, container: container))
-            let contentPadding = item.sq_contentPaddingCalculator(SQContentPaddingCalculatorArgs(item: item, container: container))
-            let frame = item.sq_frameCalculator(SQFrameCalculatorArgs(item: item, contentPadding: contentPadding, contentSpacing: contentSpacing, container: container, previous: previous, forSizingOnly: forSizingOnly))
+            if SQLayoutContainer.debugEnabled {
+                print("\(debugPrefix)   ┌─ item: \(String(describing: item.sq_rootItem))")
+                SQLayoutContainer.nestLevel += 1
+            }
+            
+            let contentSpacing = item.sq_contentSpacingCalculator?(SQContentSpacingCalculatorArgs(item: item, container: container)) ?? .zero
+            let contentPadding = item.sq_contentPaddingCalculator?(SQContentPaddingCalculatorArgs(item: item, container: container)) ?? .zero
+            let frame = (item.sq_frameCalculator ?? SQLayoutCalculators.leftAlignedVStack)(SQFrameCalculatorArgs(item: item, contentPadding: contentPadding, contentSpacing: contentSpacing, container: container, previous: previous, forSizingOnly: forSizingOnly))
 
             // Call layout observer with generated frame
-            item.sq_layoutObserver(SQLayoutObserverArgs(item: item, frame: frame, forSizingOnly: forSizingOnly))
+            item.sq_layoutObserver?(SQLayoutObserverArgs(item: item, frame: frame, forSizingOnly: forSizingOnly))
 
             // Update occupied bounds
             if !options.shouldIgnoreWhenCalculatingSize {
@@ -78,16 +85,19 @@ public class SQLayoutContainer: NSObject {
                 }
             }
 
-            print("\(debugPrefix)   └─ frame: frame=\(frame) occupiedBounds=\(occupiedBounds)")
-            SQLayoutContainer.nestLevel -= 1
+            if SQLayoutContainer.debugEnabled {
+                print("\(debugPrefix)   └─ frame: frame=\(frame) occupiedBounds=\(occupiedBounds)")
+                SQLayoutContainer.nestLevel -= 1
+            }
 
             // Update previous
             if options.saveAsPrevious {
                 previous = SQPreviousItemDescription(item: item, contentBounds: frame, contentSpacing: contentSpacing, contentPadding: contentPadding)
             }
         }
-        SQLayoutContainer.nestLevel -= 1
-
+        if SQLayoutContainer.debugEnabled {
+            SQLayoutContainer.nestLevel -= 1
+        }
         return occupiedBounds
     }
 }

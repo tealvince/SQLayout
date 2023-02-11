@@ -16,47 +16,65 @@ public protocol SQLayoutItem {
     var sq_rootItem: NSObject? { get }
     
     // Closure decorations
-    var sq_sizeCalculator: SQSizeCalculator { get }
-    var sq_frameCalculator: SQFrameCalculator { get }
-    var sq_contentSpacingCalculator: SQContentSpacingCalculator { get }
-    var sq_contentPaddingCalculator: SQContentPaddingCalculator { get }
-    var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator { get }
-    var sq_layoutObserver: SQLayoutObserver { get }
+    var sq_sizeCalculator: SQSizeCalculator? { get }
+    var sq_frameCalculator: SQFrameCalculator? { get }
+    var sq_contentSpacingCalculator: SQContentSpacingCalculator? { get }
+    var sq_contentPaddingCalculator: SQContentPaddingCalculator? { get }
+    var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { get }
+    var sq_layoutObserver: SQLayoutObserver? { get }
+}
+
+@objc
+public protocol SQMutableLayoutItem: SQLayoutItem {
+    // Mutable variables stored separately to avoid conflict with immutable property
+    var mutable_sq_rootItem: NSObject? { get set }
+    var mutable_sq_sizeCalculator: SQSizeCalculator? { get set }
+    var mutable_sq_frameCalculator: SQFrameCalculator? { get set }
+    var mutable_sq_contentSpacingCalculator: SQContentSpacingCalculator? { get set }
+    var mutable_sq_contentPaddingCalculator: SQContentPaddingCalculator? { get set }
+    var mutable_sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { get set }
+    var mutable_sq_layoutObserver: SQLayoutObserver? { get set }
 }
 
 ///
 /// A wrapper object used to add sequential layout support and mutability to wrapped objects.
 ///
 @objcMembers
-public class SQMutableProxyLayoutItem: NSObject, SQLayoutItem {
+public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
     
-    // MARK: - SQLayoutItem
-    public var sq_rootItem: NSObject?
-    
-    public var sq_sizeCalculator: SQSizeCalculator = { _ in .zero }
-    public var sq_frameCalculator: SQFrameCalculator = SQLayoutCalculators.containerLeftAlignedVStack
-    public var sq_contentSpacingCalculator: SQContentSpacingCalculator = { _ in .zero }
-    public var sq_contentPaddingCalculator: SQContentPaddingCalculator = { _ in .zero }
-    public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator = { _ in SQLayoutOptions() }
-    public var sq_layoutObserver: SQLayoutObserver = { _ in }
-    
+    // MARK: - Initializer
     init(rootItem: NSObject) {
-        if let sourceItem = rootItem as? SQLayoutItem {
-            self.sq_rootItem = sourceItem.sq_rootItem ?? rootItem
-            self.sq_sizeCalculator = sourceItem.sq_sizeCalculator
-            self.sq_frameCalculator = sourceItem.sq_frameCalculator
-            self.sq_contentSpacingCalculator = sourceItem.sq_contentSpacingCalculator
-            self.sq_contentPaddingCalculator = sourceItem.sq_contentPaddingCalculator
-            self.sq_layoutOptionsCalculator = sourceItem.sq_layoutOptionsCalculator
-            self.sq_layoutObserver = sourceItem.sq_layoutObserver
-        } else {
-            self.sq_rootItem = rootItem
-        }
+        self.mutable_sq_rootItem = rootItem.sq_rootItem ?? rootItem
+        self.mutable_sq_sizeCalculator = rootItem.sq_sizeCalculator
+        self.mutable_sq_frameCalculator = rootItem.sq_frameCalculator
+        self.mutable_sq_contentSpacingCalculator = rootItem.sq_contentSpacingCalculator
+        self.mutable_sq_contentPaddingCalculator = rootItem.sq_contentPaddingCalculator
+        self.mutable_sq_layoutOptionsCalculator = rootItem.sq_layoutOptionsCalculator
+        self.mutable_sq_layoutObserver = rootItem.sq_layoutObserver
     }
+    
+    // MARK: - SQMutableLayoutItem
+    public var mutable_sq_rootItem: NSObject?
+    public var mutable_sq_sizeCalculator: SQSizeCalculator?
+    public var mutable_sq_frameCalculator: SQFrameCalculator?
+    public var mutable_sq_contentSpacingCalculator: SQContentSpacingCalculator?
+    public var mutable_sq_contentPaddingCalculator: SQContentPaddingCalculator?
+    public var mutable_sq_layoutOptionsCalculator: SQLayoutOptionsCalculator?
+    public var mutable_sq_layoutObserver: SQLayoutObserver?
+        
+    // MARK: - SQMutableLayoutItem
+    override public var sq_rootItem: NSObject? { mutable_sq_rootItem }
+    override public var sq_sizeCalculator: SQSizeCalculator? { mutable_sq_sizeCalculator }
+    override public var sq_frameCalculator: SQFrameCalculator? { mutable_sq_frameCalculator }
+    override public var sq_contentSpacingCalculator: SQContentSpacingCalculator? { mutable_sq_contentSpacingCalculator }
+    override public var sq_contentPaddingCalculator: SQContentPaddingCalculator? { mutable_sq_contentPaddingCalculator }
+    override public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { mutable_sq_layoutOptionsCalculator }
+    override public var sq_layoutObserver: SQLayoutObserver? { mutable_sq_layoutObserver }
 }
 
 ///
-/// Extension that supports declaring custom calculators with handy .withXYZ chaining decorator syntax, e.g:
+/// Extension that supports declaring custom calculators with handy .withXYZ chaining decorator
+/// syntax, to customize functionality to an object when used as an arranged item e.g:
 ///
 /// item = view
 ///     .withSQSizeCalculator({...})
@@ -66,49 +84,66 @@ public class SQMutableProxyLayoutItem: NSObject, SQLayoutItem {
 public extension NSObject {
 
     // MARK: - Public Decorators (closures)
-    func withSQSizeCalculator(_ c: @escaping SQSizeCalculator) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_sizeCalculator = c }
+    func withSQSizeCalculator(_ c: @escaping SQSizeCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_sizeCalculator = c }
     }
-    func withSQFrameCalculator(_ c: @escaping SQFrameCalculator) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_frameCalculator = c }
+    func withSQFrameCalculator(_ c: @escaping SQFrameCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_frameCalculator = c }
     }
-    func withSQContentSpacingCalculator(_ c: @escaping SQContentSpacingCalculator) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_contentSpacingCalculator = c }
+    func withSQContentSpacingCalculator(_ c: @escaping SQContentSpacingCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_contentSpacingCalculator = c }
     }
-    func withSQContentPaddingCalculator(_ c: @escaping SQContentPaddingCalculator) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_contentPaddingCalculator = c }
+    func withSQContentPaddingCalculator(_ c: @escaping SQContentPaddingCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_contentPaddingCalculator = c }
     }
-    func withSQLayoutOptionsCalculator(_ c: @escaping SQLayoutOptionsCalculator) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_layoutOptionsCalculator = c }
+    func withSQLayoutOptionsCalculator(_ c: @escaping SQLayoutOptionsCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_layoutOptionsCalculator = c }
     }
-    func withSQLayoutObserver(_ c: @escaping SQLayoutObserver) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_layoutObserver = c }
+    func withSQLayoutObserver(_ c: @escaping SQLayoutObserver) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_layoutObserver = c }
     }
 
     // MARK: - Public Decorator (conveniences for constant return values)
-    func withSQSize(_ size: CGSize) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_sizeCalculator = {_ in size} }
+    func withSQSize(_ size: CGSize) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_sizeCalculator = {_ in size} }
     }
-    func withSQFrame(_ frame: CGRect) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_frameCalculator = {_ in frame} }
+    func withSQFrame(_ frame: CGRect) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_frameCalculator = {_ in frame} }
     }
-    func withSQContentSpacing(_ spacing: UIEdgeInsets) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_contentSpacingCalculator = {_ in spacing} }
+    func withSQContentSpacing(_ spacing: UIEdgeInsets) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_contentSpacingCalculator = {_ in spacing} }
     }
-    func withSQContentPadding(_ padding: UIEdgeInsets) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_contentPaddingCalculator = {_ in padding} }
+    func withSQContentPadding(_ padding: UIEdgeInsets) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_contentPaddingCalculator = {_ in padding} }
     }
-    func withSQLayoutOptions(_ options: SQLayoutOptions) -> SQMutableProxyLayoutItem {
-        return mutableLayoutItem() { $0.sq_layoutOptionsCalculator = {_ in options} }
+    func withSQLayoutOptions(_ options: SQLayoutOptions) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_layoutOptionsCalculator = {_ in options} }
     }
-
+    
     // MARK: - Private
-    private func mutableLayoutItem(_ initialization: @escaping (SQMutableProxyLayoutItem) -> Void) -> SQMutableProxyLayoutItem {
+    private func mutableLayoutItem(_ initialization: @escaping (SQMutableLayoutItem) -> Void) -> NSObject & SQLayoutItem {
         // Return self if already a mutable proxy, else wrap it in one
-        let item = self as? SQMutableProxyLayoutItem ?? SQMutableProxyLayoutItem(rootItem: self)
+        let item = self as? NSObject & SQMutableLayoutItem ?? SQMutableProxyLayoutItem(rootItem: self)
         initialization(item)
         return item
     }
+}
+
+
+///
+/// Add default properties for layout items
+///
+@objc
+extension NSObject: SQLayoutItem {
+
+    // MARK: - SQLayoutItem
+    public var sq_rootItem: NSObject? { return self }
+    public var sq_sizeCalculator: SQSizeCalculator? { nil }
+    public var sq_frameCalculator: SQFrameCalculator? { nil }
+    public var sq_contentSpacingCalculator: SQContentSpacingCalculator? { nil }
+    public var sq_contentPaddingCalculator: SQContentPaddingCalculator? { nil }
+    public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { nil }
+    public var sq_layoutObserver: SQLayoutObserver? { nil }
 }
 
 ///
@@ -116,25 +151,25 @@ public extension NSObject {
 /// users only need to define calculators when the default behavior needs
 /// to be customized.
 ///
-extension UIView: SQLayoutItem {
+@objc
+extension UIView {
     
     // MARK: - SQLayoutItem
-    public var sq_rootItem: NSObject? { return self }
-
-    public var sq_sizeCalculator: SQSizeCalculator { { args in
+    
+    /// Override to support sizeThatFits
+    override public var sq_sizeCalculator: SQSizeCalculator { { args in
         guard let view = args.item.sq_rootItem as? UIView else { return .zero }
         return view.sizeThatFits(args.fittingSize)
     } }
-    public var sq_contentSpacingCalculator: SQContentSpacingCalculator { { args in
+    
+    /// Override to default to contentSpacing in containing layoutView
+    override public var sq_contentSpacingCalculator: SQContentSpacingCalculator { { args in
         guard let view = args.item.sq_rootItem as? UIView, let layoutView = view.superview as? SQLayoutView else { return .zero }
         return layoutView.contentSpacing
     } }
-    public var sq_frameCalculator: SQFrameCalculator { SQLayoutCalculators.containerLeftAlignedVStack }
-    public var sq_contentPaddingCalculator: SQContentPaddingCalculator { { _ in .zero } }
-    public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator { { _ in return SQLayoutOptions() } }
 
-    // Update frame upon layout
-    public var sq_layoutObserver: SQLayoutObserver { { args in
+    /// Override to update frame upon layout
+    override public var sq_layoutObserver: SQLayoutObserver { { args in
         guard let view = args.item.sq_rootItem as? UIView, !args.forSizingOnly else { return }
         view.frame = args.frame
     } }

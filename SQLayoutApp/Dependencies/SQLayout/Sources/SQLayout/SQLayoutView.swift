@@ -25,6 +25,7 @@ public typealias SQLayoutViewInsetsCalculator = (SQLayoutView) -> UIEdgeInsets
 ///
 @objcMembers
 public class SQLayoutView: UIView {
+    
     // MARK: - Public properties
     var layoutInsets: UIEdgeInsets = .zero
     var layoutInsetsCalculator: SQLayoutViewInsetsCalculator? = nil
@@ -33,10 +34,31 @@ public class SQLayoutView: UIView {
 
     // MARK: - Private properties
     let container = SQLayoutContainer()
-
-    // MARK: - Factory methods
     
-    /// Convenience factory method for creating a layoutView mapped to a parent view
+    // MARK: - Initializers
+    public init(layoutInsetsCalculator: @escaping SQLayoutViewInsetsCalculator) {
+        self.layoutInsetsCalculator = layoutInsetsCalculator
+        super.init(frame: .zero)
+    }
+    
+    public init(layoutInsets: UIEdgeInsets = .zero) {
+        self.layoutInsets = layoutInsets
+        super.init(frame: .zero)
+    }
+    
+    convenience init() {
+        self.init(layoutInsets: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Public
+    
+    ///
+    /// Convenience factory method for creating an auto-sizing layoutView added as a subview to a parent view
+    ///
     @discardableResult
     public static func autosizedView(addedTo view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero) -> SQLayoutView {
         let contentView = SQLayoutView(layoutInsets: layoutInsets)
@@ -64,58 +86,38 @@ public class SQLayoutView: UIView {
         }
         return contentView
     }
-
-    // MARK: - Initializers
-    public init(layoutInsetsCalculator: @escaping SQLayoutViewInsetsCalculator) {
-        self.layoutInsetsCalculator = layoutInsetsCalculator
-        super.init(frame: .zero)
-    }
     
-    public init(layoutInsets: UIEdgeInsets = .zero) {
-        self.layoutInsets = layoutInsets
-        super.init(frame: .zero)
-    }
-    
-    convenience init() {
-        self.init(layoutInsets: .zero)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Public
-    
-    // Set a layout insets calculator and return self for chaining
+    /// Set a layout insets calculator and return self for chaining
     @discardableResult
-    public func useLayoutInsetsCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
+    public func addLayoutInsetsCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
         layoutInsetsCalculator = c
         layoutInsets = c(self)
         return self
     }
     
     @discardableResult
-    public func useLayoutInsets(_ insets: UIEdgeInsets) -> SQLayoutView {
-        return useLayoutInsetsCalculator({ _ in insets })
+    public func addLayoutInsets(_ insets: UIEdgeInsets) -> SQLayoutView {
+        return addLayoutInsetsCalculator({ _ in insets })
     }
 
-    // Set a content spacing calculator and return self for chaining
+    /// Set a content spacing calculator and return self for chaining
     @discardableResult
-    public func useContentSpacingCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
+    public func addContentSpacingCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
         contentSpacingCalculator = c
         contentSpacing = c(self)
         return self
     }
 
     @discardableResult
-    public func useContentSpacing(_ insets: UIEdgeInsets) -> SQLayoutView {
-        return useContentSpacingCalculator({ _ in insets })
+    public func addContentSpacing(_ insets: UIEdgeInsets) -> SQLayoutView {
+        return addContentSpacingCalculator({ _ in insets })
     }
 
     ///
     /// Add an item (typically a raw or decorated UIView), as an arranged item.
     /// If the item represents a view then add it as a subview as well.
     /// Returns self to support chaining.
+    ///
     @discardableResult
     public func addArrangedItem(_ item: SQLayoutItem) -> SQLayoutView {
         
@@ -205,7 +207,7 @@ public class SQLayoutView: UIView {
         let layoutBounds = CGRectMake(0, 0, size.width, size.height)
         let occupiedBounds = container.layoutItems(in: layoutBounds, with: layoutInsets, forSizingOnly: true)
 
-        // Return smallest size that will contain all the laid out items within the layout insets        
+        // Return smallest size that will contain all the laid out items within the layout insets
         return CGSizeMake(layoutInsets.left + CGRectGetWidth(occupiedBounds) + layoutInsets.right, layoutInsets.top + CGRectGetHeight(occupiedBounds) + layoutInsets.bottom)
     }
     
