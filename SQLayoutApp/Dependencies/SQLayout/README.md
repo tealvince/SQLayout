@@ -82,16 +82,16 @@ In addition to providing a readable alternative to manual layout, Sequential Lay
 
 * Flexibility - Unlike most container-based layout (stack views, etc), Sequential Layout views let each view customize how it is laid out, aligned, sized, and spaced relative to its parent container and a previous item.  Default calculators can still be specified for an enclosing layout view if one chooses, however.
 
-* Decorator pattern - Using decorators applied to each arranged subview avoid the need to subclass a view just to override its intrisicContentSize.
+* Decorator pattern - Using decorators applied to each arranged subview avoid the need to subclass or modify a view just to override its intrinsicContentSize or other properties.
 
-* Encapsulation - Decorators allow most of the logic for a subview to be associated and grouped with the subview itself, unlike constraints that tend to span different views making them difficult to maintain.
+* Encapsulation - Decorators allow most of the logic for a subview to be associated and grouped with the code defining the subview item itself, unlike constraints that tend to span multiple views making them difficult to read and maintain.
 
 * Nesting - Layout views are designed to be nestable, allowing more complex layouts to be created.  Note that special attention should be given to setup nested views for automatic sizing.  More of this is described under advanced topics below.
 
 
 ## Decorators
 
-Layout items (usually subviews) can be "decorated" by using a .withSQxxx() method to attach additional information about how the view should be laid out.  While layout items have default behavior and decorators are all optional, adding them allows one to customized the layout.  In addition, a .containingXXX() method can be set on a layout view to set default behavior for all its arranged items.
+Layout items (usually subviews) can be "decorated" by using a .withSQxxx() method to attach additional information about how the view should be laid out.  While layout items have default behavior and decorators are all optional, adding them allows one to customized the layout.  In addition, a .containingXXX() method can be set on a layout view to set default behavior for all its arranged items at once.
 
 * Frame calculator - given information about the bounds of the containing view and the subview previously laid out, a frame calculator does the work of layout and returns the frame after layout.  For many use cases, a predefined calculator in SQLayoutCalculators can be used as is.
 
@@ -141,11 +141,7 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
         .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
     )
 
-    // The code above is spaced out to describe each step individually.  Alternatively,
-    // we can use the containingArrangedItem() chaining method to simplify the above code.
-    // At the same time, let's say we want to space out the items vertically by 10 px,
-    // except for the space above the footer which we'll keep at 20.  We can do this
-    // with the containingDefaultSpacing() chaining method on the layoutView:
+The code above is spaced out to describe each step individually.  Alternatively, we can use the containingArrangedItem() chaining method to simplify the above code. At the same time, let's say we want to space out the items vertically by 10 px, except for the space above the footer which we'll keep at 20.  We can do this with the containingDefaultSpacing() chaining method on the layoutView:
     
     let layoutView = SQLayoutView.autosizedView(addedTo: self.view, layoutInsets: .zero)
         .containingArrangedItem(titleLabel)
@@ -164,11 +160,11 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
 
 ### Sizing
 
-SQLayoutViews themselves support sizeThatFits, which in turn powers the default size calculator when the layout view is nested as an item inside another layout view.  To calculate size automatically, the layout view does a "dry" layout into the fitting bounds given and returns the smallest size containing all the arranged subviews in the test layout.  
+SQLayoutViews themselves support sizeThatFits, which in turn powers the default size calculator when the layout view is nested as an item inside another layout view.  To calculate size automatically, the layout view does a "dry" layout into the fitting bounds given and returns the size of the smallest bounds containing all the arranged subviews in the test layout.  
 
-While this works for many simple use cases, it can break if the enclosed subviews layout based on the size of the enclosing container.  For instance, if a layout contains both left-aligned and right-aligned members, the resulting calculated size will always return the full width of the size passed in.
+While this works for many use cases, it can break if the enclosed subviews can expand based on the size of the enclosing container.  For instance, if a layout contains both left-aligned and right-aligned members, the resulting calculated size will always grow to the full width of the size passed in.
 
-To avoid this, one can optionally specify a different frame calculator for use only during sizing operations.  By keeping consistent alignment, automatic sizing can still be used.  For example, consider a horizontal row of items that we want to be aligned by their vertical centers:
+To avoid this, one can optionally specify a different frame calculator for use only during sizing operations.  By keeping consistent alignment, automatic sizing can still be used.  For example, consider a horizontal row of items that we want to be aligned by their vertical centers, but with one item that should be top-aligned:
 
     let rowLayoutView = SQLayoutView()
         .containingArrangedItem(iconImageView)
@@ -194,7 +190,7 @@ To avoid this, we can add a decorator to specify the option to ignore the view's
         
 ### Unpadding
 
-A negative padding value can be used to ignore any whitespace built into an arranged subview when positioning it.  This is useful for views such as borderless text buttons where we want to position the text inside rather than the invisible button bounds.  For more fine-tuned layout, we can use negative padding to layout text labels to their baseline and upper capHeight rather than the invisible font boundary.  To do so, set the padding equal to the negative value that each edge is inset. 
+A negative padding value can be used to ignore any whitespace built into an arranged subview when positioning it.  This is useful for views such as borderless text buttons where we want to position relative to the text inside rather than the invisible button bounds.  For more fine-tuned layout, we can also use negative padding to layout text labels to their baseline and upper capHeight rather than the invisible font container boundary.  To do so, set the padding equal to the negative value that each edge should be inset. 
 
 ### Save as previous
 
@@ -206,26 +202,26 @@ By default, views are laid out sequentially, with each view receiving the bounds
         )
         .containingArrangedItem(usernameLabel) // appears on top of avatar instead of below it
 
-While wrapping the avatar and badge together in a nests layoutView could be used to work around this, disabling the saveAsPrevious flag can also be used.  When set on an arranged item, the next view to be laid out sees the same "previous" value as the flagged view.
+While wrapping the avatar and badge together in a nested layoutView could be used to work around this, disabling the saveAsPrevious flag can also be used.  When set on an arranged item, the next view to be laid out sees the same "previous" value as the flagged view.
 
         .containingArrangedItem(avatarView)
         .containingArrangedItem(badgeIconView
             .withSQFrameCalculator(SQLayoutCalculators.topRightAligned)
             .withSQOptions(SQLayoutOptions(saveAsPrevious: false))
         )
-        .containingArrangedItem(usernameLabel)
+        .containingArrangedItem(usernameLabel) // is now positioned below avatar view
 
 ### Non-view based layout
 
-The Sequential Layout framework and calculators can also be used to calculate frames for non-UIView objects.  This can be used, for instance, to precalculate subview frames in "layoutState" objects before the views themselves have even been created.  To do this, use any NSObject as the items, and add them directly to an instance of SQLayoutContainer.  Attach a "layoutObserver" to each object to store off the frame values whenever they are calculated during layout, and call layoutItems() to start the process.
+The Sequential Layout framework and calculators can also be used to calculate frames for non-UIView objects.  This can be used, for instance, to precalculate subview frames to be stored in "layoutState" objects before the views themselves have even been created.  To do this, use any appropriate NSObject representing each rectangle as the items, and add them directly to an instance of SQLayoutContainer.  Each calculator will get a reference to the item in the sq_rootItem property.  Attach a "layoutObserver" to each object to store off the frame values whenever they are calculated during layout, and call layoutItems() to start the layout process.
 
 ### Custom frame calculators
 
 Frame calculators are just functions/closures that return a CGRect based on a SQFrameCalculatorArgs argument that describes the item, previous item, and layout container.  As such it is straightforward to write custom code to handle a unique situation not covered by a standard calculator.  The following best practices should be used observed to make a reusable calculator:
 
-* Any spacing calculated relative to a previous object should observer the minimum spacing requested by the current object and previous object in the corresponding directions.  For instance, if placing a view below the previous item, the spacing should be max(previous.spacing.bottom, current.spacing.top)
+* Any spacing calculated relative to a previous object should observer the minimum spacing requested by the current object and previous object in the appropriate corresponding directions.  For instance, if placing a view below the previous item, the spacing used should be max(previous.spacing.bottom, current.spacing.top)
 
 * To properly handle padding requested for an item, any fittingSize passed to the sizeCalculator for an item should first subtract off any the padding insets set on that item.  Then, when calculating the frame for an item, its position should be adjusted so that the requested padding exists between it and neighboring objects (padding is outside the frame of the view)
 
-* Handle the absense of a previous item in a sensible way.  Often, this consists of laying out relative to the container.  for instance, if frame calculator is intended to layout left of the previous item, it might make sense to place an item at the right edge of the container layout margin if it is the first item to be laid out.  This would allow the frame calculator to be used as a default frame calculator in a layoutView and yield expected results with no subview-specific decorators.
+* Handle the absense of a previous item in a sensible way.  Often, this consists of laying out relative to the container.  For instance, if a frame calculator is intended to layout left of the previous item, it might make sense to place an item at the right edge of the container layout margin if it is the first item to be laid out.  This would allow the frame calculator to be used as the sole default frame calculator in a layoutView and still yield expected results when items are just added to it.
 
