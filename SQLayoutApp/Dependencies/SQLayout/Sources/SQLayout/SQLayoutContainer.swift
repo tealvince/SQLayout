@@ -51,7 +51,7 @@ public class SQLayoutContainer: NSObject {
         if SQLayoutContainer.debugEnabled {
             SQLayoutContainer.nestLevel += 1
             debugPrefix = String(Array(repeating: " ", count: SQLayoutContainer.nestLevel * 3))
-            print("\(debugPrefix)Layout container: bounds=\(bounds) inset=\(insets)")
+            print("\(debugPrefix)Layout container: bounds=\(bounds) inset=\(insets) forSizing: \(forSizingOnly)")
         }
         
         for item in arrangedItems {
@@ -64,9 +64,10 @@ public class SQLayoutContainer: NSObject {
                 SQLayoutContainer.nestLevel += 1
             }
             
-            let contentSpacing = item.sq_contentSpacingCalculator?(SQContentSpacingCalculatorArgs(item: item, container: container)) ?? .zero
-            let contentPadding = item.sq_contentPaddingCalculator?(SQContentPaddingCalculatorArgs(item: item, container: container)) ?? .zero
-            let frame = (item.sq_frameCalculator ?? SQLayoutCalculators.leftAlignedVStack)(SQFrameCalculatorArgs(item: item, contentPadding: contentPadding, contentSpacing: contentSpacing, container: container, previous: previous, forSizingOnly: forSizingOnly))
+            let spacing = item.sq_spacingCalculator?(SQSpacingCalculatorArgs(item: item, container: container)) ?? .zero
+            let padding = item.sq_paddingCalculator?(SQPaddingCalculatorArgs(item: item, container: container)) ?? .zero
+            let frameCalculator = (forSizingOnly ? item.sq_sizingFrameCalculator : nil) ?? item.sq_frameCalculator ?? SQLayoutCalculators.leftAlignedVStack
+            let frame = frameCalculator(SQFrameCalculatorArgs(item: item, padding: padding, spacing: spacing, container: container, previous: previous, forSizingOnly: forSizingOnly))
 
             // Call layout observer with generated frame
             item.sq_layoutObserver?(SQLayoutObserverArgs(item: item, frame: frame, forSizingOnly: forSizingOnly))
@@ -74,10 +75,10 @@ public class SQLayoutContainer: NSObject {
             // Update occupied bounds
             if !options.shouldIgnoreWhenCalculatingSize {
                 let occupiedFrame = CGRectMake(
-                    CGRectGetMinX(frame) - contentPadding.left,
-                    CGRectGetMinY(frame) - contentPadding.top,
-                    CGRectGetWidth(frame) + contentPadding.left + contentPadding.right,
-                    CGRectGetHeight(frame) + contentPadding.top + contentPadding.bottom)
+                    CGRectGetMinX(frame) - padding.left,
+                    CGRectGetMinY(frame) - padding.top,
+                    CGRectGetWidth(frame) + padding.left + padding.right,
+                    CGRectGetHeight(frame) + padding.top + padding.bottom)
                 if occupiedBounds.isEmpty {
                     occupiedBounds = occupiedFrame
                 } else if !frame.isEmpty {
@@ -92,7 +93,7 @@ public class SQLayoutContainer: NSObject {
 
             // Update previous
             if options.saveAsPrevious {
-                previous = SQPreviousItemDescription(item: item, contentBounds: frame, contentSpacing: contentSpacing, contentPadding: contentPadding)
+                previous = SQPreviousItemDescription(item: item, contentBounds: frame, spacing: spacing, padding: padding)
             }
         }
         if SQLayoutContainer.debugEnabled {

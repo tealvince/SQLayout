@@ -53,13 +53,13 @@ public class SQContainerDescription: NSObject {
 public class SQPreviousItemDescription: NSObject {
     public let item: SQLayoutItem
     public let contentBounds: CGRect
-    public let contentSpacing: UIEdgeInsets
-    public let contentPadding: UIEdgeInsets
-    init(item: SQLayoutItem, contentBounds: CGRect, contentSpacing: UIEdgeInsets, contentPadding: UIEdgeInsets) {
+    public let spacing: UIEdgeInsets
+    public let padding: UIEdgeInsets
+    init(item: SQLayoutItem, contentBounds: CGRect, spacing: UIEdgeInsets, padding: UIEdgeInsets) {
         self.item = item
         self.contentBounds = contentBounds
-        self.contentSpacing = contentSpacing
-        self.contentPadding = contentPadding
+        self.spacing = spacing
+        self.padding = padding
     }
 }
 
@@ -80,24 +80,24 @@ public class SQSizeCalculatorArgs: NSObject {
 @objcMembers
 public class SQFrameCalculatorArgs: NSObject {
     public let item: SQLayoutItem
-    public let contentPadding: UIEdgeInsets
-    public let contentSpacing: UIEdgeInsets
+    public let padding: UIEdgeInsets
+    public let spacing: UIEdgeInsets
     public let container: SQContainerDescription
     public var previous: SQPreviousItemDescription?
     public let forSizingOnly: Bool
-    init(item: SQLayoutItem, contentPadding: UIEdgeInsets, contentSpacing: UIEdgeInsets, container: SQContainerDescription, previous: SQPreviousItemDescription? = nil, forSizingOnly: Bool) {
+    init(item: SQLayoutItem, padding: UIEdgeInsets, spacing: UIEdgeInsets, container: SQContainerDescription, previous: SQPreviousItemDescription? = nil, forSizingOnly: Bool) {
         self.item = item
-        self.contentPadding = contentPadding
-        self.contentSpacing = contentSpacing
+        self.padding = padding
+        self.spacing = spacing
         self.container = container
         self.previous = previous
         self.forSizingOnly = forSizingOnly
     }
 }
 
-/// Arguments passed to ContentSpacing calculators
+/// Arguments passed to Spacing calculators
 @objcMembers
-public class SQContentSpacingCalculatorArgs: NSObject {
+public class SQSpacingCalculatorArgs: NSObject {
     public let item: SQLayoutItem
     public let container: SQContainerDescription
     init(item: SQLayoutItem, container: SQContainerDescription) {
@@ -106,9 +106,9 @@ public class SQContentSpacingCalculatorArgs: NSObject {
     }
 }
 
-/// Arguments passed ContentPadding calculators
+/// Arguments passed Padding calculators
 @objcMembers
-public class SQContentPaddingCalculatorArgs: NSObject {
+public class SQPaddingCalculatorArgs: NSObject {
     public let item: SQLayoutItem
     public let container: SQContainerDescription
     init(item: SQLayoutItem, container: SQContainerDescription) {
@@ -151,14 +151,14 @@ public typealias SQFrameCalculator = (SQFrameCalculatorArgs) -> CGRect
 
 /// Returns the minimum spacing requested for an item relative to the previous/next items
 /// during sequential layout.  Use of this field depends on well-behaved frame calculators
-public typealias SQContentSpacingCalculator = (SQContentSpacingCalculatorArgs) -> UIEdgeInsets
+public typealias SQSpacingCalculator = (SQSpacingCalculatorArgs) -> UIEdgeInsets
 
 /// Returns adjustments frame calculators should make to the position of returned frame
 /// to add or remove padding around the content of an item.  Use positive values to add
 /// padding; negative values to ignore built-in whitespace in an item (borderless buttons,
-/// text ascenders, etc) when laying out an item.  Unlike a contentSpacing, contentPadding
+/// text ascenders, etc) when laying out an item.  Unlike a spacing, padding
 /// handling is handled internally in an item generally opaque from other items.
-public typealias SQContentPaddingCalculator =  (SQContentPaddingCalculatorArgs) -> UIEdgeInsets
+public typealias SQPaddingCalculator =  (SQPaddingCalculatorArgs) -> UIEdgeInsets
 
 /// Returns options that fine-tune how this item is handled during layout
 public typealias SQLayoutOptionsCalculator = (SQLayoutOptionsCalculatorArgs) -> SQLayoutOptions

@@ -18,8 +18,9 @@ public protocol SQLayoutItem {
     // Closure decorations
     var sq_sizeCalculator: SQSizeCalculator? { get }
     var sq_frameCalculator: SQFrameCalculator? { get }
-    var sq_contentSpacingCalculator: SQContentSpacingCalculator? { get }
-    var sq_contentPaddingCalculator: SQContentPaddingCalculator? { get }
+    var sq_sizingFrameCalculator: SQFrameCalculator? { get }
+    var sq_spacingCalculator: SQSpacingCalculator? { get }
+    var sq_paddingCalculator: SQPaddingCalculator? { get }
     var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { get }
     var sq_layoutObserver: SQLayoutObserver? { get }
 }
@@ -30,8 +31,9 @@ public protocol SQMutableLayoutItem: SQLayoutItem {
     var mutable_sq_rootItem: NSObject? { get set }
     var mutable_sq_sizeCalculator: SQSizeCalculator? { get set }
     var mutable_sq_frameCalculator: SQFrameCalculator? { get set }
-    var mutable_sq_contentSpacingCalculator: SQContentSpacingCalculator? { get set }
-    var mutable_sq_contentPaddingCalculator: SQContentPaddingCalculator? { get set }
+    var mutable_sq_sizingFrameCalculator: SQFrameCalculator? { get set }
+    var mutable_sq_spacingCalculator: SQSpacingCalculator? { get set }
+    var mutable_sq_paddingCalculator: SQPaddingCalculator? { get set }
     var mutable_sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { get set }
     var mutable_sq_layoutObserver: SQLayoutObserver? { get set }
 }
@@ -47,8 +49,9 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
         self.mutable_sq_rootItem = rootItem.sq_rootItem ?? rootItem
         self.mutable_sq_sizeCalculator = rootItem.sq_sizeCalculator
         self.mutable_sq_frameCalculator = rootItem.sq_frameCalculator
-        self.mutable_sq_contentSpacingCalculator = rootItem.sq_contentSpacingCalculator
-        self.mutable_sq_contentPaddingCalculator = rootItem.sq_contentPaddingCalculator
+        self.mutable_sq_sizingFrameCalculator = rootItem.sq_sizingFrameCalculator
+        self.mutable_sq_spacingCalculator = rootItem.sq_spacingCalculator
+        self.mutable_sq_paddingCalculator = rootItem.sq_paddingCalculator
         self.mutable_sq_layoutOptionsCalculator = rootItem.sq_layoutOptionsCalculator
         self.mutable_sq_layoutObserver = rootItem.sq_layoutObserver
     }
@@ -57,19 +60,28 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
     public var mutable_sq_rootItem: NSObject?
     public var mutable_sq_sizeCalculator: SQSizeCalculator?
     public var mutable_sq_frameCalculator: SQFrameCalculator?
-    public var mutable_sq_contentSpacingCalculator: SQContentSpacingCalculator?
-    public var mutable_sq_contentPaddingCalculator: SQContentPaddingCalculator?
+    public var mutable_sq_sizingFrameCalculator: SQFrameCalculator?
+    public var mutable_sq_spacingCalculator: SQSpacingCalculator?
+    public var mutable_sq_paddingCalculator: SQPaddingCalculator?
     public var mutable_sq_layoutOptionsCalculator: SQLayoutOptionsCalculator?
     public var mutable_sq_layoutObserver: SQLayoutObserver?
         
     // MARK: - SQMutableLayoutItem
     override public var sq_rootItem: NSObject? { mutable_sq_rootItem }
-    override public var sq_sizeCalculator: SQSizeCalculator? { mutable_sq_sizeCalculator }
-    override public var sq_frameCalculator: SQFrameCalculator? { mutable_sq_frameCalculator }
-    override public var sq_contentSpacingCalculator: SQContentSpacingCalculator? { mutable_sq_contentSpacingCalculator }
-    override public var sq_contentPaddingCalculator: SQContentPaddingCalculator? { mutable_sq_contentPaddingCalculator }
-    override public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { mutable_sq_layoutOptionsCalculator }
-    override public var sq_layoutObserver: SQLayoutObserver? { mutable_sq_layoutObserver }
+    override public var sq_sizeCalculator: SQSizeCalculator?
+        { mutable_sq_sizeCalculator ?? mutable_sq_rootItem?.sq_sizeCalculator }
+    override public var sq_frameCalculator: SQFrameCalculator?
+        { mutable_sq_frameCalculator ?? mutable_sq_rootItem?.sq_frameCalculator }
+    override public var sq_sizingFrameCalculator: SQFrameCalculator?
+        { mutable_sq_sizingFrameCalculator ?? mutable_sq_rootItem?.sq_sizingFrameCalculator }
+    override public var sq_spacingCalculator: SQSpacingCalculator?
+        { mutable_sq_spacingCalculator ?? mutable_sq_rootItem?.sq_spacingCalculator }
+    override public var sq_paddingCalculator: SQPaddingCalculator?
+        { mutable_sq_paddingCalculator ?? mutable_sq_rootItem?.sq_paddingCalculator }
+    override public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator?
+        { mutable_sq_layoutOptionsCalculator ?? mutable_sq_rootItem?.sq_layoutOptionsCalculator }
+    override public var sq_layoutObserver: SQLayoutObserver?
+        { mutable_sq_layoutObserver ?? mutable_sq_rootItem?.sq_layoutObserver }
 }
 
 ///
@@ -78,7 +90,7 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
 ///
 /// item = view
 ///     .withSQSizeCalculator({...})
-///     .withSQContentSpacingCalculator({...})
+///     .withSQSpacingCalculator({...})
 ///
 @objc
 public extension NSObject {
@@ -90,11 +102,14 @@ public extension NSObject {
     func withSQFrameCalculator(_ c: @escaping SQFrameCalculator) -> NSObject & SQLayoutItem {
         return mutableLayoutItem() { $0.mutable_sq_frameCalculator = c }
     }
-    func withSQContentSpacingCalculator(_ c: @escaping SQContentSpacingCalculator) -> NSObject & SQLayoutItem {
-        return mutableLayoutItem() { $0.mutable_sq_contentSpacingCalculator = c }
+    func withSQSizingFrameCalculator(_ c: @escaping SQFrameCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_sizingFrameCalculator = c }
     }
-    func withSQContentPaddingCalculator(_ c: @escaping SQContentPaddingCalculator) -> NSObject & SQLayoutItem {
-        return mutableLayoutItem() { $0.mutable_sq_contentPaddingCalculator = c }
+    func withSQSpacingCalculator(_ c: @escaping SQSpacingCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_spacingCalculator = c }
+    }
+    func withSQPaddingCalculator(_ c: @escaping SQPaddingCalculator) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_paddingCalculator = c }
     }
     func withSQLayoutOptionsCalculator(_ c: @escaping SQLayoutOptionsCalculator) -> NSObject & SQLayoutItem {
         return mutableLayoutItem() { $0.mutable_sq_layoutOptionsCalculator = c }
@@ -110,11 +125,14 @@ public extension NSObject {
     func withSQFrame(_ frame: CGRect) -> NSObject & SQLayoutItem {
         return mutableLayoutItem() { $0.mutable_sq_frameCalculator = {_ in frame} }
     }
-    func withSQContentSpacing(_ spacing: UIEdgeInsets) -> NSObject & SQLayoutItem {
-        return mutableLayoutItem() { $0.mutable_sq_contentSpacingCalculator = {_ in spacing} }
+    func withSQSizingFrame(_ frame: CGRect) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_sizingFrameCalculator = {_ in frame} }
     }
-    func withSQContentPadding(_ padding: UIEdgeInsets) -> NSObject & SQLayoutItem {
-        return mutableLayoutItem() { $0.mutable_sq_contentPaddingCalculator = {_ in padding} }
+    func withSQSpacing(_ spacing: UIEdgeInsets) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_spacingCalculator = {_ in spacing} }
+    }
+    func withSQPadding(_ padding: UIEdgeInsets) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { $0.mutable_sq_paddingCalculator = {_ in padding} }
     }
     func withSQLayoutOptions(_ options: SQLayoutOptions) -> NSObject & SQLayoutItem {
         return mutableLayoutItem() { $0.mutable_sq_layoutOptionsCalculator = {_ in options} }
@@ -140,37 +158,9 @@ extension NSObject: SQLayoutItem {
     public var sq_rootItem: NSObject? { return self }
     public var sq_sizeCalculator: SQSizeCalculator? { nil }
     public var sq_frameCalculator: SQFrameCalculator? { nil }
-    public var sq_contentSpacingCalculator: SQContentSpacingCalculator? { nil }
-    public var sq_contentPaddingCalculator: SQContentPaddingCalculator? { nil }
+    public var sq_sizingFrameCalculator: SQFrameCalculator? { nil }
+    public var sq_spacingCalculator: SQSpacingCalculator? { nil }
+    public var sq_paddingCalculator: SQPaddingCalculator? { nil }
     public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? { nil }
     public var sq_layoutObserver: SQLayoutObserver? { nil }
-}
-
-///
-/// Add layoutItem support to UIView with reasonable default behavior so that
-/// users only need to define calculators when the default behavior needs
-/// to be customized.
-///
-@objc
-extension UIView {
-    
-    // MARK: - SQLayoutItem
-    
-    /// Override to support sizeThatFits
-    override public var sq_sizeCalculator: SQSizeCalculator { { args in
-        guard let view = args.item.sq_rootItem as? UIView else { return .zero }
-        return view.sizeThatFits(args.fittingSize)
-    } }
-    
-    /// Override to default to contentSpacing in containing layoutView
-    override public var sq_contentSpacingCalculator: SQContentSpacingCalculator { { args in
-        guard let view = args.item.sq_rootItem as? UIView, let layoutView = view.superview as? SQLayoutView else { return .zero }
-        return layoutView.contentSpacing
-    } }
-
-    /// Override to update frame upon layout
-    override public var sq_layoutObserver: SQLayoutObserver { { args in
-        guard let view = args.item.sq_rootItem as? UIView, !args.forSizingOnly else { return }
-        view.frame = args.frame
-    } }
 }

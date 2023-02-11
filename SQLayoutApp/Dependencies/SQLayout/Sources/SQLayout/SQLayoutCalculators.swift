@@ -27,7 +27,7 @@ public class SQLayoutCalculators: NSObject {
     ///  Place item at origin at size fit for container layout area
     ///
     public static func origin(_ args: SQFrameCalculatorArgs) -> CGRect {
-        let fittingSize = itemFittingSizeForContainer(args.container, padding: args.contentPadding)
+        let fittingSize = itemFittingSizeForContainer(args.container, padding: args.padding)
         let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
         
         return CGRectMake(0, 0, size.width, size.height)
@@ -347,18 +347,18 @@ public class SQLayoutCalculators: NSObject {
     /// Match container layout area
     ///
     public static func matchContainer(_ args: SQFrameCalculatorArgs) -> CGRect {
-        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.contentPadding.left
-        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.contentPadding.right
-        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.contentPadding.top
-        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.contentPadding.bottom
+        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.padding.left
+        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right
+        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.padding.top
+        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.padding.bottom
         
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
     public static func matchContainerFullBleed(_ args: SQFrameCalculatorArgs) -> CGRect {
-        let l = CGRectGetMinX(args.container.layoutBounds) + args.contentPadding.left
-        let r = CGRectGetMaxX(args.container.layoutBounds) - args.contentPadding.right
-        let t = CGRectGetMinY(args.container.layoutBounds) + args.contentPadding.top
-        let b = CGRectGetMaxY(args.container.layoutBounds) - args.contentPadding.bottom
+        let l = CGRectGetMinX(args.container.layoutBounds) + args.padding.left
+        let r = CGRectGetMaxX(args.container.layoutBounds) - args.padding.right
+        let t = CGRectGetMinY(args.container.layoutBounds) + args.padding.top
+        let b = CGRectGetMaxY(args.container.layoutBounds) - args.padding.bottom
         
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
@@ -374,10 +374,10 @@ public class SQLayoutCalculators: NSObject {
     public static func matchPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
         guard let previous = args.previous else { return matchContainer(args) }
         
-        let l = CGRectGetMinX(previous.contentBounds) - previous.contentPadding.left + args.contentPadding.left
-        let r = CGRectGetMaxX(previous.contentBounds) + previous.contentPadding.right - args.contentPadding.right
-        let t = CGRectGetMinY(previous.contentBounds) - previous.contentPadding.top + args.contentPadding.top
-        let b = CGRectGetMaxY(previous.contentBounds) + previous.contentPadding.bottom - args.contentPadding.bottom
+        let l = CGRectGetMinX(previous.contentBounds) - previous.padding.left + args.padding.left
+        let r = CGRectGetMaxX(previous.contentBounds) + previous.padding.right - args.padding.right
+        let t = CGRectGetMinY(previous.contentBounds) - previous.padding.top + args.padding.top
+        let b = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom - args.padding.bottom
         
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
@@ -529,21 +529,21 @@ public class SQLayoutCalculators: NSObject {
     ///
     public static func topAlignedFlow(_ args: SQFrameCalculatorArgs) -> CGRect {
         var rect = topAlignedHStack(args)
-        if CGRectGetMaxX(rect) + args.contentPadding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
+        if CGRectGetMaxX(rect) + args.padding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
             rect = containerLeftAlignedVStack(args)
         }
         return rect
     }
     public static func bottomAlignedFlow(_ args: SQFrameCalculatorArgs) -> CGRect {
         var rect = bottomAlignedHStack(args)
-        if CGRectGetMaxX(rect) + args.contentPadding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
+        if CGRectGetMaxX(rect) + args.padding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
             rect = containerLeftAlignedVStack(args)
         }
         return rect
     }
     public static func centerAlignedFlow(_ args: SQFrameCalculatorArgs) -> CGRect {
         var rect = centerAlignedHStack(args)
-        if CGRectGetMaxX(rect) + args.contentPadding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
+        if CGRectGetMaxX(rect) + args.padding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
             rect = containerLeftAlignedVStack(args)
         }
         return rect
@@ -567,26 +567,26 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return matchContainer(args) }
 
         let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
-        let r = CGRectGetMinX(previous.contentBounds) - previous.contentPadding.left - max(previous.contentSpacing.left, args.contentSpacing.right)
+        let r = CGRectGetMinX(previous.contentBounds) - previous.padding.left - max(previous.spacing.left, args.spacing.right)
         let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
 
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
         let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, r - l - args.contentPadding.left - args.contentPadding.right, size.height)
+        return CGRectMake(t + args.padding.top, l + args.padding.left, r - l - args.padding.left - args.padding.right, size.height)
     }
 
     public static func containerCroppedRightOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
         guard let previous = args.previous else { return matchContainer(args) }
 
-        let l = CGRectGetMaxX(previous.contentBounds) + previous.contentPadding.right + max(previous.contentSpacing.right, args.contentSpacing.left)
+        let l = CGRectGetMaxX(previous.contentBounds) + previous.padding.right + max(previous.spacing.right, args.spacing.left)
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
         let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
 
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
         let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, r - l - args.contentPadding.left - args.contentPadding.right, size.height)
+        return CGRectMake( l + args.padding.left, t + args.padding.top, r - l - args.padding.left - args.padding.right, size.height)
     }
 
     /// ````
@@ -605,26 +605,26 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return matchContainer(args) }
 
         let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
-        let b = CGRectGetMinY(previous.contentBounds) - previous.contentPadding.top - max(previous.contentSpacing.top, args.contentSpacing.bottom)
+        let b = CGRectGetMinY(previous.contentBounds) - previous.padding.top - max(previous.spacing.top, args.spacing.bottom)
         let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
 
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
         let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, size.width, b - t - args.contentPadding.top - args.contentPadding.bottom)
+        return CGRectMake(l + args.padding.left, t + args.padding.top, size.width, b - t - args.padding.top - args.padding.bottom)
     }
 
     public static func containerCroppedBelowPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
         guard let previous = args.previous else { return matchContainer(args) }
 
-        let t = CGRectGetMaxY(previous.contentBounds) + previous.contentPadding.bottom + max(previous.contentSpacing.bottom, args.contentSpacing.top)
+        let t = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom + max(previous.spacing.bottom, args.spacing.top)
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
         let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
 
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
         let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, size.width, b - t - args.contentPadding.top - args.contentPadding.bottom)
+        return CGRectMake(l + args.padding.left, t + args.padding.top, size.width, b - t - args.padding.top - args.padding.bottom)
     }
 
     // MARK: - Private
@@ -652,7 +652,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerBottom(args, rect: rect) }
         
         var rect = rect
-        rect.origin.y = CGRectGetMinY(previous.contentBounds) - previous.contentPadding.top - max(previous.contentSpacing.top, args.contentSpacing.bottom) - args.contentPadding.bottom - CGRectGetHeight(rect)
+        rect.origin.y = CGRectGetMinY(previous.contentBounds) - previous.padding.top - max(previous.spacing.top, args.spacing.bottom) - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
     
@@ -660,7 +660,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerTop(args, rect: rect) }
         
         var rect = rect
-        rect.origin.y = CGRectGetMaxY(previous.contentBounds) + previous.contentPadding.bottom + max(previous.contentSpacing.bottom, args.contentSpacing.top) + args.contentPadding.top
+        rect.origin.y = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom + max(previous.spacing.bottom, args.spacing.top) + args.padding.top
         return rect
     }
     
@@ -668,7 +668,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerRight(args, rect: rect) }
         
         var rect = rect
-        rect.origin.x = CGRectGetMinX(previous.contentBounds) - previous.contentPadding.left - max(previous.contentSpacing.left, args.contentSpacing.right) - args.contentPadding.right - CGRectGetWidth(rect)
+        rect.origin.x = CGRectGetMinX(previous.contentBounds) - previous.padding.left - max(previous.spacing.left, args.spacing.right) - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
     
@@ -676,7 +676,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerLeft(args, rect: rect) }
         
         var rect = rect
-        rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.contentPadding.right + max(previous.contentSpacing.right, args.contentSpacing.left) + args.contentPadding.left
+        rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.padding.right + max(previous.spacing.right, args.spacing.left) + args.padding.left
         return rect
     }
 
@@ -684,25 +684,25 @@ public class SQLayoutCalculators: NSObject {
     
     private static func alignToContainerTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
-        rect.origin.y = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.contentPadding.top
+        rect.origin.y = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.padding.top
         return rect
     }
     
     private static func alignToContainerLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
-        rect.origin.x = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.contentPadding.left
+        rect.origin.x = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.padding.left
         return rect
     }
     
     private static func alignToContainerBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
-        rect.origin.y = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.contentPadding.bottom - CGRectGetHeight(rect)
+        rect.origin.y = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
     
     private static func alignToContainerRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
-        rect.origin.x = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.contentPadding.right - CGRectGetWidth(rect)
+        rect.origin.x = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
     
@@ -710,9 +710,9 @@ public class SQLayoutCalculators: NSObject {
         var rect = rect
         let left = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
         let right = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
-        let width = CGRectGetWidth(rect) + args.contentPadding.left + args.contentPadding.right
+        let width = CGRectGetWidth(rect) + args.padding.left + args.padding.right
         
-        rect.origin.x = (left + right)/2 - width/2 + args.contentPadding.left
+        rect.origin.x = (left + right)/2 - width/2 + args.padding.left
         return rect
     }
     
@@ -720,9 +720,9 @@ public class SQLayoutCalculators: NSObject {
         var rect = rect
         let top = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
         let bottom = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
-        let height = CGRectGetHeight(rect) + args.contentPadding.top + args.contentPadding.bottom
+        let height = CGRectGetHeight(rect) + args.padding.top + args.padding.bottom
         
-        rect.origin.y = (top + bottom)/2 - height/2 + args.contentPadding.top
+        rect.origin.y = (top + bottom)/2 - height/2 + args.padding.top
         return rect
     }
     
@@ -732,7 +732,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerTop(args, rect: rect) }
         
         var rect = rect
-        rect.origin.y = CGRectGetMinY(previous.contentBounds) - previous.contentPadding.top + args.contentPadding.top
+        rect.origin.y = CGRectGetMinY(previous.contentBounds) - previous.padding.top + args.padding.top
         return rect
     }
     
@@ -740,7 +740,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerLeft(args, rect: rect) }
         
         var rect = rect
-        rect.origin.x = CGRectGetMinX(previous.contentBounds) - previous.contentPadding.left + args.contentPadding.left
+        rect.origin.x = CGRectGetMinX(previous.contentBounds) - previous.padding.left + args.padding.left
         return rect
     }
     
@@ -748,7 +748,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerBottom(args, rect: rect) }
         
         var rect = rect
-        rect.origin.y = CGRectGetMaxY(previous.contentBounds) + previous.contentPadding.bottom - args.contentPadding.bottom - CGRectGetHeight(rect)
+        rect.origin.y = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
     
@@ -756,7 +756,7 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerRight(args, rect: rect) }
         
         var rect = rect
-        rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.contentPadding.right - args.contentPadding.right - CGRectGetWidth(rect)
+        rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.padding.right - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
     
@@ -764,11 +764,11 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerCenterX(args, rect: rect) }
         
         var rect = rect
-        let left = CGRectGetMinX(previous.contentBounds) - args.contentPadding.left
-        let right = CGRectGetMaxX(previous.contentBounds) + args.contentPadding.right
-        let width = CGRectGetWidth(rect) + args.contentPadding.left + args.contentPadding.right
+        let left = CGRectGetMinX(previous.contentBounds)
+        let right = CGRectGetMaxX(previous.contentBounds)
+        let width = CGRectGetWidth(rect) + args.padding.left + args.padding.right
         
-        rect.origin.x = (left + right)/2 - width/2 + args.contentPadding.left
+        rect.origin.x = (left + right)/2 - width/2 + args.padding.left
         return rect
     }
     
@@ -776,11 +776,11 @@ public class SQLayoutCalculators: NSObject {
         guard let previous = args.previous else { return alignToContainerCenterY(args, rect: rect) }
         
         var rect = rect
-        let top = CGRectGetMinY(previous.contentBounds) - args.contentPadding.top
-        let bottom = CGRectGetMaxY(previous.contentBounds) + args.contentPadding.bottom
-        let height = CGRectGetHeight(rect) + args.contentPadding.top + args.contentPadding.bottom
+        let top = CGRectGetMinY(previous.contentBounds)
+        let bottom = CGRectGetMaxY(previous.contentBounds)
+        let height = CGRectGetHeight(rect) + args.padding.top + args.padding.bottom
         
-        rect.origin.y = (top + bottom)/2 - height/2 + args.contentPadding.top
+        rect.origin.y = (top + bottom)/2 - height/2 + args.padding.top
         return rect
     }
 
@@ -788,14 +788,16 @@ public class SQLayoutCalculators: NSObject {
 
     public static func extendToContainerRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
+        let right = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right
         
-        rect.size.width = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.contentPadding.right - CGRectGetMinX(rect)
+        rect.size.width = right - CGRectGetMinX(rect)
         return rect
     }
 
     private static func extendToContainerLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
-        let diff = CGRectGetMinX(rect) - (CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left)
+        let left = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.padding.left
+        let diff = CGRectGetMinX(rect) - left
         
         rect.origin.x -= diff
         rect.size.width += diff
