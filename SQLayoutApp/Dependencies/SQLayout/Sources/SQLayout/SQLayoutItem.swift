@@ -121,18 +121,21 @@ extension UIView: SQLayoutItem {
     // MARK: - SQLayoutItem
     public var sq_rootItem: NSObject? { return self }
 
-    public var sq_sizeCalculator: SQSizeCalculator { { [weak self] args in return self?.sizeThatFits(args.fittingSize) ?? .zero } }
+    public var sq_sizeCalculator: SQSizeCalculator { { args in
+        guard let view = args.item.sq_rootItem as? UIView else { return .zero }
+        return view.sizeThatFits(args.fittingSize)
+    } }
+    public var sq_contentSpacingCalculator: SQContentSpacingCalculator { { args in
+        guard let view = args.item.sq_rootItem as? UIView, let layoutView = view.superview as? SQLayoutView else { return .zero }
+        return layoutView.contentSpacing
+    } }
     public var sq_frameCalculator: SQFrameCalculator { SQLayoutCalculators.containerLeftAlignedVStack }
-    public var sq_contentSpacingCalculator: SQContentSpacingCalculator { { _ in UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8) } }
     public var sq_contentPaddingCalculator: SQContentPaddingCalculator { { _ in .zero } }
     public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator { { _ in return SQLayoutOptions() } }
 
     // Update frame upon layout
-    public var sq_layoutObserver: SQLayoutObserver {
-        { [weak self] args in
-            if !args.forSizingOnly {
-                self?.frame = args.frame
-            }
-        }
-    }
+    public var sq_layoutObserver: SQLayoutObserver { { args in
+        guard let view = args.item.sq_rootItem as? UIView, !args.forSizingOnly else { return }
+        view.frame = args.frame
+    } }
 }

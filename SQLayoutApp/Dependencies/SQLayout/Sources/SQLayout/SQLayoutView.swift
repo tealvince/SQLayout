@@ -28,6 +28,8 @@ public class SQLayoutView: UIView {
     // MARK: - Public properties
     var layoutInsets: UIEdgeInsets = .zero
     var layoutInsetsCalculator: SQLayoutViewInsetsCalculator? = nil
+    var contentSpacing: UIEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+    var contentSpacingCalculator: SQLayoutViewInsetsCalculator? = nil
 
     // MARK: - Private properties
     let container = SQLayoutContainer()
@@ -35,7 +37,8 @@ public class SQLayoutView: UIView {
     // MARK: - Factory methods
     
     /// Convenience factory method for creating a layoutView mapped to a parent view
-    public static func contentView(addedTo view: UIView, layoutGuide: UILayoutGuide?, layoutInsets: UIEdgeInsets = .zero) -> SQLayoutView {
+    @discardableResult
+    public static func autosizedView(addedTo view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero) -> SQLayoutView {
         let contentView = SQLayoutView(layoutInsets: layoutInsets)
         
         // Add content view as subview
@@ -68,7 +71,7 @@ public class SQLayoutView: UIView {
         super.init(frame: .zero)
     }
     
-    public init(layoutInsets: UIEdgeInsets) {
+    public init(layoutInsets: UIEdgeInsets = .zero) {
         self.layoutInsets = layoutInsets
         super.init(frame: .zero)
     }
@@ -83,6 +86,32 @@ public class SQLayoutView: UIView {
     
     // MARK: - Public
     
+    // Set a layout insets calculator and return self for chaining
+    @discardableResult
+    public func useLayoutInsetsCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
+        layoutInsetsCalculator = c
+        layoutInsets = c(self)
+        return self
+    }
+    
+    @discardableResult
+    public func useLayoutInsets(_ insets: UIEdgeInsets) -> SQLayoutView {
+        return useLayoutInsetsCalculator({ _ in insets })
+    }
+
+    // Set a content spacing calculator and return self for chaining
+    @discardableResult
+    public func useContentSpacingCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
+        contentSpacingCalculator = c
+        contentSpacing = c(self)
+        return self
+    }
+
+    @discardableResult
+    public func useContentSpacing(_ insets: UIEdgeInsets) -> SQLayoutView {
+        return useContentSpacingCalculator({ _ in insets })
+    }
+
     ///
     /// Add an item (typically a raw or decorated UIView), as an arranged item.
     /// If the item represents a view then add it as a subview as well.
@@ -119,6 +148,15 @@ public class SQLayoutView: UIView {
     }
     
     ///
+    /// Remove all arranged items
+    ///
+    public func removeAllArrangedItems() {
+        for item in container.arrangedItems {
+            removeArrangedItem(item)
+        }
+    }
+    
+    ///
     /// Set arranged subview items
     ///
     public func setArrangedItems(_ items: [SQLayoutItem]) {
@@ -148,16 +186,30 @@ public class SQLayoutView: UIView {
         if let layoutInsetsCalculator = layoutInsetsCalculator {
             layoutInsets = layoutInsetsCalculator(self)
         }
+        if let contentSpacingCalculator = contentSpacingCalculator {
+            contentSpacing = contentSpacingCalculator(self)
+        }
         // Call container to layout subviews
         container.layoutItems(in: self.bounds, with: layoutInsets, forSizingOnly: false)
     }
     
     public override func sizeThatFits(_ size: CGSize) -> CGSize {
+        // Update insets
+        if let layoutInsetsCalculator = layoutInsetsCalculator {
+            layoutInsets = layoutInsetsCalculator(self)
+        }
+        if let contentSpacingCalculator = contentSpacingCalculator {
+            contentSpacing = contentSpacingCalculator(self)
+        }
         // Call container to get rectangle occupied by items during layout pass
-        let layoutBounds = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, size.width, size.height)
+        let layoutBounds = CGRectMake(0, 0, size.width, size.height)
         let occupiedBounds = container.layoutItems(in: layoutBounds, with: layoutInsets, forSizingOnly: true)
 
         // Return smallest size that will contain all the laid out items within the layout insets        
         return CGSizeMake(layoutInsets.left + CGRectGetWidth(occupiedBounds) + layoutInsets.right, layoutInsets.top + CGRectGetHeight(occupiedBounds) + layoutInsets.bottom)
+    }
+    
+    public override var intrinsicContentSize: CGSize {
+        return sizeThatFits(CGSizeMake(CGFloat.greatestFiniteMagnitude, CGFloat.greatestFiniteMagnitude))
     }
 }

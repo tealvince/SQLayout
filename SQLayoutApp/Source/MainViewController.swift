@@ -23,7 +23,7 @@ class MainViewController: UIViewController {
         self.view.backgroundColor = UIColor.white
 
         // Create and add content view
-        let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide, layoutInsets: UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20))
+        let contentView = SQLayoutView.autosizedView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide, layoutInsets: UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20))
 
         // Create title label
         let titleLabel = UILabel()

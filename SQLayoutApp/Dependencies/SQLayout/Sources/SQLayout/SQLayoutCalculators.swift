@@ -313,22 +313,22 @@ public class SQLayoutCalculators: NSObject {
     /// Place an item filling the space between the previous item and container edge
     ///
     public static func topAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: topAlignedHStack(args))
+        return extendToContainerRight(args, rect: alignToPreviousTop(args, rect: containerCroppedRightOfPrevious(args)))
     }
     public static func topAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerLeft(args, rect: topAlignedHStackLeft(args))
+        return extendToContainerLeft(args, rect: alignToPreviousTop(args, rect: containerCroppedLeftOfPrevious(args)))
     }
     public static func bottomAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: bottomAlignedHStack(args))
+        return extendToContainerRight(args, rect: alignToPreviousBottom(args, rect: containerCroppedRightOfPrevious(args)))
     }
     public static func bottomAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerLeft(args, rect: bottomAlignedHStackLeft(args))
+        return extendToContainerLeft(args, rect: alignToPreviousBottom(args, rect: containerCroppedLeftOfPrevious(args)))
     }
     public static func centerAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: centerAlignedHStack(args))
+        return extendToContainerRight(args, rect: alignToPreviousCenterY(args, rect: containerCroppedRightOfPrevious(args)))
     }
     public static func centerAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerLeft(args, rect: centerAlignedHStackLeft(args))
+        return extendToContainerLeft(args, rect: alignToPreviousCenterY(args, rect: containerCroppedLeftOfPrevious(args)))
     }
 
     // MARK: - Public (Match)
@@ -549,14 +549,99 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
+    // MARK: - Restricted to part of container on one side of previous
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌───────┐                 │
+    /// │  │ curr  │ ┌───────┐       │
+    /// │  │       │ │ prev  │       │
+    /// │  │       │ └───────┘       │
+    /// │  │       │                 │
+    /// │  │       │                 │
+    /// │  └───────┘                 │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    public static func containerCroppedLeftOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        guard let previous = args.previous else { return matchContainer(args) }
+
+        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
+        let r = CGRectGetMinX(previous.contentBounds) - previous.contentPadding.left - max(previous.contentSpacing.left, args.contentSpacing.right)
+        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
+        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
+
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, r - l - args.contentPadding.left - args.contentPadding.right, size.height)
+    }
+
+    public static func containerCroppedRightOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        guard let previous = args.previous else { return matchContainer(args) }
+
+        let l = CGRectGetMaxX(previous.contentBounds) + previous.contentPadding.right + max(previous.contentSpacing.right, args.contentSpacing.left)
+        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
+        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
+        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
+
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, r - l - args.contentPadding.left - args.contentPadding.right, size.height)
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌──────────────────────┐  │
+    /// │  │                      │  │
+    /// │  │       curr           │  │
+    /// │  │                      │  │
+    /// │  └──────────────────────┘  │
+    /// │            ┌───────┐       │
+    /// │            │ prev  │       │
+    /// │            └───────┘       │
+    /// └────────────────────────────┘
+    ///
+    public static func containerCroppedAbovePrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        guard let previous = args.previous else { return matchContainer(args) }
+
+        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
+        let b = CGRectGetMinY(previous.contentBounds) - previous.contentPadding.top - max(previous.contentSpacing.top, args.contentSpacing.bottom)
+        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
+        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
+
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, size.width, b - t - args.contentPadding.top - args.contentPadding.bottom)
+    }
+
+    public static func containerCroppedBelowPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        guard let previous = args.previous else { return matchContainer(args) }
+
+        let t = CGRectGetMaxY(previous.contentBounds) + previous.contentPadding.bottom + max(previous.contentSpacing.bottom, args.contentSpacing.top)
+        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
+        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
+        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
+
+        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.contentPadding)
+        let size = args.item.sq_sizeCalculator(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize))
+        return CGRectMake(t + args.contentPadding.top, l + args.contentPadding.left, size.width, b - t - args.contentPadding.top - args.contentPadding.bottom)
+    }
+
     // MARK: - Private
     
     // Return the fitting size to be used when sizing items to fit in the container.
     // Inset by container and insets and any padding specified by the item so we have
     // space to add them back later.
     private static func itemFittingSizeForContainer(_ container: SQContainerDescription, padding: UIEdgeInsets) -> CGSize {
-        let width = CGRectGetWidth(container.layoutBounds) - container.layoutInsets.left - container.layoutInsets.right - padding.left - padding.right
-        let height = CGRectGetHeight(container.layoutBounds) - container.layoutInsets.top - container.layoutInsets.bottom - padding.top - padding.bottom
+        let width = CGRectGetWidth(container.layoutBounds) - container.layoutInsets.left - container.layoutInsets.right
+        let height = CGRectGetHeight(container.layoutBounds) - container.layoutInsets.top - container.layoutInsets.bottom
+        
+        return itemFittingSizeForSize(CGSizeMake(width, height), padding: padding)
+    }
+    
+    private static func itemFittingSizeForSize(_ size: CGSize, padding: UIEdgeInsets) -> CGSize {
+        let width = size.width - padding.left - padding.right
+        let height = size.height - padding.top - padding.bottom
         
         return CGSizeMake(width, height)
     }
@@ -594,7 +679,7 @@ public class SQLayoutCalculators: NSObject {
         rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.contentPadding.right + max(previous.contentSpacing.right, args.contentSpacing.left) + args.contentPadding.left
         return rect
     }
-    
+
     // MARK: - Private (re-alignment to container convenience utilities)
     
     private static func alignToContainerTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
