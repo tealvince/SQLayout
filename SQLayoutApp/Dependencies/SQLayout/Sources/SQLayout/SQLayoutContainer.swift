@@ -3,6 +3,7 @@
 //  SQLayout
 //
 //  Created by Vince Lee on 2/6/23.
+//  (c)2023 All Rights Reserved
 //
 
 import UIKit
@@ -48,12 +49,16 @@ public class SQLayoutContainer: NSObject {
         var occupiedBounds = CGRect.zero
         var debugPrefix = ""
         
+        // Print debug info if debugging enabled
         if SQLayoutContainer.debugEnabled {
             SQLayoutContainer.nestLevel += 1
             debugPrefix = String(Array(repeating: " ", count: SQLayoutContainer.nestLevel * 3))
             print("\(debugPrefix)Layout container: bounds=\(bounds) inset=\(insets) forSizing: \(forSizingOnly)")
         }
         
+        //
+        // Loop thru all arranged items
+        //
         for item in arrangedItems {
             let options = item.sq_layoutOptionsCalculator?(SQLayoutOptionsCalculatorArgs(item: item, container: container)) ?? SQLayoutOptions()
             
@@ -64,6 +69,7 @@ public class SQLayoutContainer: NSObject {
                 SQLayoutContainer.nestLevel += 1
             }
             
+            // Calculate spacing, padding, frame
             let spacing = item.sq_spacingCalculator?(SQSpacingCalculatorArgs(item: item, container: container)) ?? .zero
             let padding = item.sq_paddingCalculator?(SQPaddingCalculatorArgs(item: item, container: container)) ?? .zero
             let frameCalculator = (forSizingOnly ? item.sq_sizingFrameCalculator : nil) ?? item.sq_frameCalculator ?? SQLayoutCalculators.leftAlignedVStack
@@ -91,7 +97,7 @@ public class SQLayoutContainer: NSObject {
                 SQLayoutContainer.nestLevel -= 1
             }
 
-            // Update previous
+            // Update "previous" variable for next item
             if options.saveAsPrevious {
                 previous = SQPreviousItemDescription(item: item, contentBounds: frame, spacing: spacing, padding: padding)
             }
