@@ -15,7 +15,49 @@ import UIKit
 @objcMembers
 public class SQLayoutCalculators: NSObject {
 
-    // MARK: - Public (Matching)
+    // MARK: - Size calculators
+
+    // Convenience view size calculator that applies common modifications
+    // to the size returned by sizeThatFits(), avoiding the need to specify
+    // a custom calculator closure in many cases.  Adds optional delta
+    // values to width/height and/or minimum/maximum size values
+    public static func viewSizeCalculator(addWidth: CGFloat = 0, addHeight: CGFloat = 0, minSize: CGSize? = nil, maxSize: CGSize? = nil) -> SQSizeCalculator {
+        { args in
+            guard let view = args.item.sq_rootItem as? UIView else { return .zero }
+            var fittingSize = args.fittingSize
+
+            // Apply modifications to "fitting size"
+            if let minSize = minSize {
+                fittingSize.width = max(minSize.width, fittingSize.width)
+                fittingSize.height = max(minSize.height, fittingSize.height)
+            }
+            if let maxSize = maxSize {
+                fittingSize.width = min(maxSize.width, fittingSize.width)
+                fittingSize.height = min(maxSize.height, fittingSize.height)
+            }
+
+            fittingSize.width -= addWidth
+            fittingSize.height -= addHeight
+
+            var size = view.sizeThatFits(fittingSize)
+
+            // Apply modifications to final size
+            size.width += addWidth
+            size.height += addHeight
+
+            if let minSize = minSize {
+                size.width = max(minSize.width, size.width)
+                size.height = max(minSize.height, size.height)
+            }
+            if let maxSize = maxSize {
+                size.width = min(maxSize.width, size.width)
+                size.height = min(maxSize.height, size.height)
+            }
+            return size
+        }
+    }
+
+    // MARK: - Frame calculators (Matching)
 
     /// ````
     /// ┌────────────────────────────┐
@@ -66,7 +108,7 @@ public class SQLayoutCalculators: NSObject {
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
 
-    // MARK: - Public (Corner/Center aligned)
+    // MARK: - Frame calculators (Corner/Center aligned)
 
     /// ````
     /// ┌────────────────────────────┐
@@ -254,7 +296,7 @@ public class SQLayoutCalculators: NSObject {
     public static func topRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousTop(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌─────────┐               │
@@ -365,8 +407,8 @@ public class SQLayoutCalculators: NSObject {
         return alignToPreviousCenterX(args, rect: sizedToFitHorizontally(args, rect: matchPrevious(args)))
     }
 
-    // MARK: - Public (Container VStack)
-    
+    // MARK: - Frame calculators (Container VStack)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌────────┐                │
@@ -387,7 +429,7 @@ public class SQLayoutCalculators: NSObject {
     public static func containerLeftAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignAbovePrevious(args, rect: containerTopLeftAligned(args))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                ┌────────┐  │
@@ -408,7 +450,7 @@ public class SQLayoutCalculators: NSObject {
     public static func containerRightAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToContainerRight(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │         ┌────────┐         │
@@ -429,7 +471,7 @@ public class SQLayoutCalculators: NSObject {
     public static func containerCenterAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToContainerCenterX(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌──────────────────────┐  │
@@ -451,8 +493,8 @@ public class SQLayoutCalculators: NSObject {
         return alignAbovePrevious(args, rect: sizedToFitVertically(args, rect: matchContainer(args)))
     }
 
-    // MARK: - Public (Previous VStack)
-    
+    // MARK: - Frame calculators (Previous VStack)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │         ┌────────┐         │
@@ -473,7 +515,7 @@ public class SQLayoutCalculators: NSObject {
     public static func leftAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousLeft(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │         ┌────────┐         │
@@ -494,7 +536,7 @@ public class SQLayoutCalculators: NSObject {
     public static func rightAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousRight(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │       ┌────────┐           │
@@ -537,8 +579,8 @@ public class SQLayoutCalculators: NSObject {
         return alignAbovePrevious(args, rect: sizedToFitVertically(args, rect: matchPrevious(args)))
     }
 
-    // MARK: - Public (Container HStack)
-    
+    // MARK: - Frame calculators (Container HStack)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌───────┐ ┌───────┐       │
@@ -556,7 +598,7 @@ public class SQLayoutCalculators: NSObject {
     public static func containerTopAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignLeftOfPrevious(args, rect: containerTopLeftAligned(args))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -574,7 +616,7 @@ public class SQLayoutCalculators: NSObject {
     public static func containerBottomAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToContainerBottom(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -613,8 +655,8 @@ public class SQLayoutCalculators: NSObject {
     }
 
 
-    // MARK: - Public (Previous HStack)
-    
+    // MARK: - Frame calculators (Previous HStack)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -632,7 +674,7 @@ public class SQLayoutCalculators: NSObject {
     public static func topAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousTop(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │            ┌───────┐       │
@@ -650,7 +692,7 @@ public class SQLayoutCalculators: NSObject {
     public static func bottomAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousBottom(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │            ┌───────┐       │
@@ -669,7 +711,7 @@ public class SQLayoutCalculators: NSObject {
     public static func centerAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousCenterY(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -688,8 +730,8 @@ public class SQLayoutCalculators: NSObject {
         return alignLeftOfPrevious(args, rect: sizedToFitHorizontally(args, rect: matchPrevious(args)))
     }
 
-    // MARK: - Public (Fill)
-    
+    // MARK: - Frame calculators (Fill)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -707,7 +749,7 @@ public class SQLayoutCalculators: NSObject {
     public static func topAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousTop(args, rect: sizedToFitVertically(args, rect: containerLeftOfPrevious(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │             ┌────────────┐ │
@@ -723,7 +765,7 @@ public class SQLayoutCalculators: NSObject {
     public static func bottomAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousBottom(args, rect: sizedToFitVertically(args, rect: containerLeftOfPrevious(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │             ┌────────────┐ │
@@ -757,8 +799,8 @@ public class SQLayoutCalculators: NSObject {
     }
 
 
-    // MARK: - Public (Flow)
-    
+    // MARK: - Frame calculators (Flow)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌───────┐ ┌───────┐       │
@@ -875,7 +917,7 @@ public class SQLayoutCalculators: NSObject {
     public static func containerBelowPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
         let baseRect = matchContainer(args)
         let shiftedRect = alignBelowPrevious(args, rect: baseRect)
-        
+
         return CGRectMake(CGRectGetMinX(baseRect), CGRectGetMinY(shiftedRect), CGRectGetWidth(baseRect), CGRectGetMaxY(baseRect) - CGRectGetMinY(shiftedRect))
     }
 }
@@ -894,55 +936,55 @@ extension SQLayoutCalculators {
 
         return CGRectMake(rect.origin.x, rect.origin.y, size.width, size.height)
     }
-    
+
     public static func sizedToFitVertically(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var sizedRect = sizedToFit(args, rect: CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, CGFloat.greatestFiniteMagnitude))
-        
+
         sizedRect.size.width = rect.size.width
         return sizedRect
     }
-    
+
     public static func sizedToFitHorizontally(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var sizedRect = sizedToFit(args, rect: CGRectMake(rect.origin.x, rect.origin.y, CGFloat.greatestFiniteMagnitude, rect.size.height))
-        
+
         sizedRect.size.height = rect.size.height
         return sizedRect
     }
-    
+
     // MARK: - Aligning next to previous
-    
+
     public static func alignAbovePrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerBottom(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.y = CGRectGetMinY(previous.contentBounds) - previous.padding.top - max(previous.spacing.top, args.spacing.bottom) - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
-    
+
     public static func alignBelowPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerTop(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.y = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom + max(previous.spacing.bottom, args.spacing.top) + args.padding.top
         return rect
     }
-    
+
     public static func alignLeftOfPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerRight(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.x = CGRectGetMinX(previous.contentBounds) - previous.padding.left - max(previous.spacing.left, args.spacing.right) - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
-    
+
     public static func alignRightOfPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerLeft(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.padding.right + max(previous.spacing.right, args.spacing.left) + args.padding.left
         return rect
     }
-    
+
     // MARK: - Aligning to container edges
 
     public static func alignToContainerTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
@@ -950,106 +992,106 @@ extension SQLayoutCalculators {
         rect.origin.y = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.padding.top
         return rect
     }
-    
+
     public static func alignToContainerLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.x = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.padding.left
         return rect
     }
-    
+
     public static func alignToContainerBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.y = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
-    
+
     public static func alignToContainerRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.x = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
-    
+
     public static func alignToContainerCenterX(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         let left = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
         let right = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
         let width = CGRectGetWidth(rect) + args.padding.left + args.padding.right
-        
+
         rect.origin.x = (left + right)/2 - width/2 + args.padding.left
         return rect
     }
-    
+
     public static func alignToContainerCenterY(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         let top = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
         let bottom = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
         let height = CGRectGetHeight(rect) + args.padding.top + args.padding.bottom
-        
+
         rect.origin.y = (top + bottom)/2 - height/2 + args.padding.top
         return rect
     }
-    
+
     // MARK: - Aligning to previous edges
-    
+
     public static func alignToPreviousTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerTop(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.y = CGRectGetMinY(previous.contentBounds) - previous.padding.top + args.padding.top
         return rect
     }
-    
+
     public static func alignToPreviousLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerLeft(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.x = CGRectGetMinX(previous.contentBounds) - previous.padding.left + args.padding.left
         return rect
     }
-    
+
     public static func alignToPreviousBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerBottom(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.y = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
-    
+
     public static func alignToPreviousRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerRight(args, rect: rect) }
-        
+
         var rect = rect
         rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.padding.right - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
-    
+
     public static func alignToPreviousCenterX(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerCenterX(args, rect: rect) }
-        
+
         var rect = rect
         let left = CGRectGetMinX(previous.contentBounds)
         let right = CGRectGetMaxX(previous.contentBounds)
         let width = CGRectGetWidth(rect) + args.padding.left + args.padding.right
-        
+
         rect.origin.x = (left + right)/2 - width/2 + args.padding.left
         return rect
     }
-    
+
     public static func alignToPreviousCenterY(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerCenterY(args, rect: rect) }
-        
+
         var rect = rect
         let top = CGRectGetMinY(previous.contentBounds)
         let bottom = CGRectGetMaxY(previous.contentBounds)
         let height = CGRectGetHeight(rect) + args.padding.top + args.padding.bottom
-        
+
         rect.origin.y = (top + bottom)/2 - height/2 + args.padding.top
         return rect
     }
 
     public static func cropToPreviousHeight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return rect }
-        
+
         var rect = rect
         rect.size.height = CGRectGetHeight(previous.contentBounds) + previous.padding.top + previous.padding.bottom - args.padding.top - args.padding.bottom
         return rect
@@ -1057,7 +1099,7 @@ extension SQLayoutCalculators {
 
     public static func cropToPreviousWidth(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return rect }
-        
+
         var rect = rect
         rect.size.width = CGRectGetWidth(previous.contentBounds) + previous.padding.left + previous.padding.right - args.padding.left - args.padding.right
         return rect

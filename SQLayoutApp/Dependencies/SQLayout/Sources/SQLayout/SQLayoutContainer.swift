@@ -31,7 +31,7 @@ import UIKit
 public class SQLayoutContainer: NSObject {
     public static var debugEnabled = false
     private static var nestLevel = 0
-    
+
     public var arrangedItems: [SQLayoutItem] = []
     public let maxDimension: CGFloat = 10000    // clip fitting sizes to reasonable values to prevent overflows
 
@@ -48,27 +48,27 @@ public class SQLayoutContainer: NSObject {
         var previous: SQPreviousItemDescription?
         var occupiedBounds = CGRect.zero
         var debugPrefix = ""
-        
+
         // Print debug info if debugging enabled
         if SQLayoutContainer.debugEnabled {
             SQLayoutContainer.nestLevel += 1
             debugPrefix = String(Array(repeating: " ", count: SQLayoutContainer.nestLevel * 3))
             print("\(debugPrefix)Layout container: bounds=\(bounds) inset=\(insets) forSizing: \(forSizingOnly)")
         }
-        
+
         //
         // Loop thru all arranged items
         //
         for item in arrangedItems {
             let options = item.sq_layoutOptionsCalculator?(SQLayoutOptionsCalculatorArgs(item: item, container: container)) ?? SQLayoutOptions()
-            
+
             guard !options.shouldSkipLayout else { continue }
 
             if SQLayoutContainer.debugEnabled {
                 print("\(debugPrefix)   ┌─ item: \(String(describing: item.sq_rootItem))")
                 SQLayoutContainer.nestLevel += 1
             }
-            
+
             // Calculate spacing, padding, frame
             let spacing = item.sq_spacingCalculator?(SQSpacingCalculatorArgs(item: item, container: container)) ?? .zero
             let padding = item.sq_paddingCalculator?(SQPaddingCalculatorArgs(item: item, container: container)) ?? .zero

@@ -15,7 +15,7 @@ import UIKit
 public protocol SQLayoutItem {
     // The real item if the current item is a proxy
     var sq_rootItem: NSObject? { get }
-    
+
     // Closure decorations
     var sq_sizeCalculator: SQSizeCalculator? { get }
     var sq_frameCalculator: SQFrameCalculator? { get }
@@ -44,12 +44,12 @@ public protocol SQMutableLayoutItem: SQLayoutItem {
 ///
 @objcMembers
 public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
-    
+
     // MARK: - Initializer
     init(rootItem: NSObject) {
         self.mutable_sq_rootItem = rootItem.sq_rootItem ?? rootItem
     }
-    
+
     // MARK: - SQMutableLayoutItem
     public var mutable_sq_rootItem: NSObject?
     public var mutable_sq_sizeCalculator: SQSizeCalculator?
@@ -59,7 +59,7 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
     public var mutable_sq_paddingCalculator: SQPaddingCalculator?
     public var mutable_sq_layoutOptionsCalculator: SQLayoutOptionsCalculator?
     public var mutable_sq_layoutObserver: SQLayoutObserver?
-        
+
     // MARK: - SQLayoutItem
     override public var sq_rootItem: NSObject? { mutable_sq_rootItem }
     override public var sq_sizeCalculator: SQSizeCalculator?
@@ -131,7 +131,7 @@ public extension NSObject {
     func withSQLayoutOptions(_ options: SQLayoutOptions) -> NSObject & SQLayoutItem {
         return mutableLayoutItem() { $0.mutable_sq_layoutOptionsCalculator = {_ in options} }
     }
-    
+
     // MARK: - Private
     private func mutableLayoutItem(_ initialization: @escaping (SQMutableLayoutItem) -> Void) -> NSObject & SQLayoutItem {
         // Return self if already a mutable proxy, else wrap it in one

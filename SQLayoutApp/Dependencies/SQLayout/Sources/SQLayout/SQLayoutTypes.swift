@@ -21,7 +21,7 @@ import UIKit
 public class SQLayoutOptions: NSObject {
     /// When true, this object is ignored during layout
     let shouldSkipLayout: Bool
-    
+
     /// If true, this object's bounds are ignored when finding the
     /// "occupied" bounds used to calculate a view size.  This is
     /// useful for ignoring background images and other decoration

@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let viewController = MainViewController()
         self.window?.rootViewController = viewController
         self.window?.isHidden = false
-        
+
         self.window?.makeKeyAndVisible()
         return true
     }

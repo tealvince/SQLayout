@@ -14,15 +14,15 @@ Typical layout code usually looks something like the following.  The views to la
 
     override func layoutSubviews() {
         super.layoutSubviews
-    
+
         let layoutBounds = self.contentView.bounds
         var x = 0
         var y = 0
-        
+
         let titleSize = self.titleLabel.sizeThatFits(layoutBounds.size.width, CGFloat.max)
         self.titleLabel.frame = CGRectMake(x, y, titleSize.width, titleSize.height)
         y += titleSize.height + 20
-    
+
         ....
     }
 
@@ -35,7 +35,7 @@ Instead, each arranged subview defines its own behavior based on "calculator" bl
 The following is a simple example of five subviews, two vertically stacked labels followed by three buttons laid out using a flow (reading order) layout:
 
     let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
-          
+
     contentView.addArrangedItem(self.titleLabel
         .withSQFrameCalculator(SQLayoutCalculators.containerLeftAlignedVStack)
     )
@@ -117,7 +117,7 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
     // method to create the layout view, add it as a subview, and set the 
     // appropriate layout constraints in a single method
 
-    let layoutView = SQLayoutView.autosizedView(addedTo: self.view, layoutInsets: .zero)
+    let layoutView = SQLayoutView.addAutosizedView(to: self.view, layoutInsets: .zero)
 
     // Assuming we have already created some subviews (titleLabel and subtitleLabel), we add
     // them to our layoutView.  The default frame calculator lays out items vertically aligned
@@ -144,8 +144,8 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
     )
 
 The code above is spaced out to describe each step individually.  Alternatively, we can use the containingArrangedItem() chaining method to simplify the above code. At the same time, let's say we want to space out the items vertically by 10 px, except for the space above the footer which we'll keep at 20.  We can do this with the containingDefaultSpacing() chaining method on the layoutView:
-    
-    let layoutView = SQLayoutView.autosizedView(addedTo: self.view, layoutInsets: .zero)
+
+    let layoutView = SQLayoutView.addAutosizedView(to: self.view, layoutInsets: .zero)
         .containingArrangedItem(titleLabel)
         .containingArrangedItem(subtitleLabel)
         .containingArrangedItem(actionButton
@@ -156,10 +156,10 @@ The code above is spaced out to describe each step individually.  Alternatively,
             .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
         )
         .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
-    
+
 Now let's say we want to support multiple action buttons, and have the row of them centered horizontally in the container view.  Since centering a group along the same axis we are adding them cannot be done sequentially, we can wrap the group in another layout view to accomplish this:
 
-    let layoutView = SQLayoutView.autosizedView(addedTo: self.view, layoutInsets: .zero)
+    let layoutView = SQLayoutView.addAutosizedView(to: self.view, layoutInsets: .zero)
         .containingArrangedItem(titleLabel)
         .containingArrangedItem(subtitleLabel)
         .containingArrangedItem(SQLayoutView()
@@ -177,7 +177,7 @@ Now let's say we want to support multiple action buttons, and have the row of th
         .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
 
 Note that the "with...()" decorator methods can be applied to any layoutItem and determine their layout inside an enclosing layoutView, while the "containing...()" methods only apply to the layoutView containers themselves and set defaults for all layoutItems inside.  In this example, the buttons are wrapped by a layoutView that is itself also a layoutItem, so it has both "with..." and "containing..." methods called on it.
-  
+
 ## Advanced topics
 
 ### Sizing
@@ -209,7 +209,7 @@ To avoid this, we can add a decorator to specify the option to ignore the view's
             .withSQFrameCalculator(SQLayoutCalculators.matchContainer)
             .withSQOptions(SQLayoutOptions(shouldIgnoreWhenCalculatingSize: true))
         )
-        
+
 ### Unpadding
 
 A negative padding value can be used to ignore any whitespace built into an arranged subview when positioning it.  This is useful for views such as borderless text buttons where we want to position relative to the text inside rather than the invisible button bounds.  For more fine-tuned layout, we can also use negative padding to layout text labels to their baseline and upper capHeight rather than the invisible font container boundary.  To do so, set the padding equal to the negative value that each edge should be inset. 

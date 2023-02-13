@@ -26,11 +26,11 @@ public typealias SQLayoutViewInsetsCalculator = (SQLayoutView) -> UIEdgeInsets
 ///
 @objcMembers
 public class SQLayoutView: UIView {
-    
+
     // MARK: - Public properties
     var layoutInsetsCalculator: SQLayoutViewInsetsCalculator? = nil
     var layoutInsets: UIEdgeInsets { get { layoutInsetsCalculator?(self) ?? .zero } set { layoutInsetsCalculator = {_ in newValue } } }
-    
+
     /// Default calculators for arranged items (if not specifically set by item decorator)
     var defaultSizeCalculator: SQSizeCalculator?
     var defaultFrameCalculator: SQFrameCalculator?
@@ -42,34 +42,34 @@ public class SQLayoutView: UIView {
 
     // MARK: - Private properties
     let container = SQLayoutContainer()
-    
+
     // MARK: - Initializers
     public init(layoutInsetsCalculator: @escaping SQLayoutViewInsetsCalculator) {
         self.layoutInsetsCalculator = layoutInsetsCalculator
         super.init(frame: .zero)
     }
-    
+
     public convenience init(layoutInsets: UIEdgeInsets = .zero) {
         self.init(layoutInsetsCalculator: { _ in layoutInsets })
     }
-    
+
     public convenience init() {
         self.init(layoutInsets: .zero)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Public
-    
+
     ///
     /// Convenience factory method for creating an auto-sizing layoutView added as a subview to a parent view
     ///
     @discardableResult
-    public static func autosizedView(addedTo view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero) -> SQLayoutView {
+    public static func addAutosizedView(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero) -> SQLayoutView {
         let contentView = SQLayoutView(layoutInsets: layoutInsets)
-        
+
         // Add content view as subview
         view.addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -92,14 +92,14 @@ public class SQLayoutView: UIView {
         }
         return contentView
     }
-    
+
     ///
     /// Add an item (typically a raw or decorated UIView), as an arranged item.
     /// If the item represents a view then add it as a subview as well.
     /// Returns self to support chaining.
     ///
     public func addArrangedItem(_ item: SQLayoutItem) {
-        
+
         // Add item to container
         container.arrangedItems.append(item)
 
@@ -109,7 +109,7 @@ public class SQLayoutView: UIView {
         }
         setNeedsLayout()
     }
-    
+
     ///
     /// Remove an arranged item.  If the item represents a view, remove it as subview.
     ///
@@ -118,7 +118,7 @@ public class SQLayoutView: UIView {
         if let index = container.arrangedItems.firstIndex(where: { $0.sq_rootItem === item.sq_rootItem }) {
             // Remove from container
             container.arrangedItems.remove(at: index)
-            
+
             // Unlink subview, if appropriate
             if let subview = item.sq_rootItem as? UIView, subview.superview === self {
                 subview.removeFromSuperview()
@@ -126,7 +126,7 @@ public class SQLayoutView: UIView {
             setNeedsLayout()
         }
     }
-    
+
     ///
     /// Remove all arranged items
     ///
@@ -135,22 +135,22 @@ public class SQLayoutView: UIView {
             removeArrangedItem(item)
         }
     }
-    
+
     ///
     /// Set arranged subview items
     ///
     public func setArrangedItems(_ items: [SQLayoutItem]) {
-        
+
         // Unlink any subviews we are no longer arranging
         for item in container.arrangedItems {
             if let subview = item.sq_rootItem as? UIView, subview.superview === self {
                 subview.removeFromSuperview()
             }
         }
-        
+
         // Update container
         container.arrangedItems = items
-        
+
         // Add new subviews
         for item in items {
             if let subview = item.sq_rootItem as? UIView {
@@ -162,16 +162,19 @@ public class SQLayoutView: UIView {
 
     // MARK: - Public (Chaining support)
 
+    @discardableResult
     public func containingArrangedItem(_ item: SQLayoutItem) -> SQLayoutView {
         addArrangedItem(item)
         return self
     }
 
+    @discardableResult
     public func containingLayoutInsetsCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
         layoutInsetsCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingLayoutInsets(_ insets: UIEdgeInsets) -> SQLayoutView {
         return containingLayoutInsetsCalculator({ _ in insets })
     }
@@ -185,66 +188,79 @@ public class SQLayoutView: UIView {
     /// layout item in another layout view, the "containing" functions must precede any "withSQxxx" functions.
     ///
 
+    @discardableResult
     public func containingDefaultSizeCalculator(_ c: @escaping SQSizeCalculator) -> SQLayoutView {
         defaultSizeCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingDefaultSize(_ size: CGSize) -> SQLayoutView {
         defaultSizeCalculator = {_ in size }
         return self
     }
 
+    @discardableResult
     public func containingDefaultFrameCalculator(_ c: @escaping SQFrameCalculator) -> SQLayoutView {
         defaultFrameCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingDefaultFrame(_ frame: CGRect) -> SQLayoutView {
         defaultFrameCalculator = {_ in frame }
         return self
     }
 
+    @discardableResult
     public func containingDefaultSizingFrameCalculator(_ c: @escaping SQFrameCalculator) -> SQLayoutView {
         defaultSizingFrameCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingDefaultSizingFrame(_ frame: CGRect) -> SQLayoutView {
         defaultSizingFrameCalculator = {_ in frame }
         return self
     }
 
+    @discardableResult
     public func containingDefaultSpacingCalculator(_ c: @escaping SQSpacingCalculator) -> SQLayoutView {
         defaultSpacingCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingDefaultSpacing(_ spacing: UIEdgeInsets) -> SQLayoutView {
         defaultSpacingCalculator = {_ in spacing }
         return self
     }
 
+    @discardableResult
     public func containingDefaultPaddingCalculator(_ c: @escaping SQPaddingCalculator) -> SQLayoutView {
         defaultPaddingCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingDefaultPadding(_ padding: UIEdgeInsets) -> SQLayoutView {
         defaultPaddingCalculator = {_ in padding }
         return self
     }
 
+    @discardableResult
     public func containingDefaultLayoutOptionsCalculator(_ c: @escaping SQLayoutOptionsCalculator) -> SQLayoutView {
         defaultLayoutOptionsCalculator = c
         return self
     }
 
+    @discardableResult
     public func containingDefaultLayoutOptions(_ options: SQLayoutOptions) -> SQLayoutView {
         defaultLayoutOptionsCalculator = {_ in options }
         return self
     }
 
+    @discardableResult
     public func containingDefaultLayoutObserver(_ observer: @escaping SQLayoutObserver) -> SQLayoutView {
         defaultLayoutObserver = observer
         return self
@@ -254,15 +270,15 @@ public class SQLayoutView: UIView {
     public override func layoutSubviews() {
         // Update insets
         let layoutInsets = layoutInsets
-        
+
         // Call container to layout subviews
         container.layoutItems(in: self.bounds, with: layoutInsets, forSizingOnly: false)
     }
-    
+
     public override func sizeThatFits(_ size: CGSize) -> CGSize {
         // Update insets
         let layoutInsets = layoutInsets
-        
+
         // Call container to get rectangle occupied by items during layout pass
         let layoutBounds = CGRectMake(0, 0, size.width, size.height)
         let occupiedBounds = container.layoutItems(in: layoutBounds, with: layoutInsets, forSizingOnly: true)
@@ -270,7 +286,7 @@ public class SQLayoutView: UIView {
         // Return smallest size that will contain all the laid out items within the layout insets
         return CGSizeMake(layoutInsets.left + CGRectGetWidth(occupiedBounds) + layoutInsets.right, layoutInsets.top + CGRectGetHeight(occupiedBounds) + layoutInsets.bottom)
     }
-    
+
     public override var intrinsicContentSize: CGSize {
         return sizeThatFits(CGSizeMake(CGFloat.greatestFiniteMagnitude, CGFloat.greatestFiniteMagnitude))
     }
@@ -282,7 +298,7 @@ public class SQLayoutView: UIView {
 ///
 @objc
 extension UIView {
-    
+
     // MARK: - SQLayoutItem
 
     override public var sq_sizeCalculator: SQSizeCalculator? {
@@ -307,11 +323,11 @@ extension UIView {
     override public var sq_paddingCalculator: SQPaddingCalculator? {
         return (self.superview as? SQLayoutView)?.defaultPaddingCalculator
     }
-    
+
     override public var sq_layoutOptionsCalculator: SQLayoutOptionsCalculator? {
         return (self.superview as? SQLayoutView)?.defaultLayoutOptionsCalculator
     }
-    
+
     override public var sq_layoutObserver: SQLayoutObserver? {
         return (self.superview as? SQLayoutView)?.defaultLayoutObserver ?? { [weak self] args in
             // Override to set frame upon layout
