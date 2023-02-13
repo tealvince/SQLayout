@@ -14,326 +14,9 @@ import UIKit
 ///
 @objcMembers
 public class SQLayoutCalculators: NSObject {
-    
-    // MARK: - Public (origin)
-    
-    /// ````
-    /// ┌────────┐───────────────────┐
-    /// │ curr   │                   │
-    /// └────────┘                   │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    ///  Place item at origin at size fit for container layout area
-    ///
-    public static func origin(_ args: SQFrameCalculatorArgs) -> CGRect {
-        let fittingSize = itemFittingSizeForContainer(args.container, padding: args.padding)
-        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        
-        return CGRectMake(0, 0, size.width, size.height)
-    }
-    
-    // MARK: - Public (Container VStack)
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │  ┌────────┐                │
-    /// │  │ prev   │                │
-    /// │  └────────┘                │
-    /// │  ┌──────────────┐          │
-    /// │  │ curr         │          │
-    /// │  └──────────────┘          │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous along the left edge of the container bounds
-    ///
-    public static func containerLeftAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerLeft(args, rect: alignBelowPrevious(args, rect: origin(args)))
-    }
-    public static func containerLeftAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerLeft(args, rect: alignAbovePrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │                ┌────────┐  │
-    /// │                │ prev   │  │
-    /// │                └────────┘  │
-    /// │          ┌──────────────┐  │
-    /// │          │ curr         │  │
-    /// │          └──────────────┘  │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous along the right edge of the container bounds
-    ///
-    public static func containerRightAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerRight(args, rect: alignBelowPrevious(args, rect: origin(args)))
-    }
-    public static func containerRightAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerRight(args, rect: alignAbovePrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │         ┌────────┐         │
-    /// │         │ prev   │         │
-    /// │         └────────┘         │
-    /// │      ┌──────────────┐      │
-    /// │      │ curr         │      │
-    /// │      └──────────────┘      │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous along the x centerline of the container bounds
-    ///
-    public static func containerCenterAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerCenterX(args, rect: alignBelowPrevious(args, rect: origin(args)))
-    }
-    public static func containerCenterAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerCenterX(args, rect: alignAbovePrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │  ┌──────────────────────┐  │
-    /// │  │ prev                 │  │
-    /// │  └──────────────────────┘  │
-    /// │  ┌──────────────────────┐  │
-    /// │  │ curr                 │  │
-    /// │  └──────────────────────┘  │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous stretched to the full width of the container bounds
-    ///
-    public static func containerWidthVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: containerLeftAlignedVStack(args))
-    }
-    public static func containerWidthVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: containerLeftAlignedVStackUp(args))
-    }
-    
-    // MARK: - Public (Previous VStack)
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │         ┌────────┐         │
-    /// │         │ prev   │         │
-    /// │         └────────┘         │
-    /// │         ┌──────────────┐   │
-    /// │         │ curr         │   │
-    /// │         └──────────────┘   │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous aligned on the left edge
-    ///
-    public static func leftAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousLeft(args, rect: alignBelowPrevious(args, rect: origin(args)))
-    }
-    public static func leftAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousLeft(args, rect: alignAbovePrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │         ┌────────┐         │
-    /// │         │ prev   │         │
-    /// │         └────────┘         │
-    /// │   ┌──────────────┐         │
-    /// │   │ curr         │         │
-    /// │   └──────────────┘         │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous aligned on the right edge
-    ///
-    public static func rightAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousRight(args, rect: alignBelowPrevious(args, rect: origin(args)))
-    }
-    public static func rightAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousRight(args, rect: alignAbovePrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │       ┌────────┐           │
-    /// │       │ prev   │           │
-    /// │       └────────┘           │
-    /// │    ┌──────────────┐        │
-    /// │    │ curr         │        │
-    /// │    └──────────────┘        │
-    /// │                            │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item below the previous along their centerlines
-    ///
-    public static func centerAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousCenterX(args, rect: alignBelowPrevious(args, rect: origin(args)))
-    }
-    public static func centerAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousCenterX(args, rect: alignAbovePrevious(args, rect: origin(args)))
-    }
-    
-    // MARK: - Public (Container HStack)
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │  ┌───────┐ ┌───────┐       │
-    /// │  │ prev  │ │ curr  │       │
-    /// │  └───────┘ │       │       │
-    /// │            └───────┘       │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item to right of the previous along the top edge of the container bounds
-    ///
-    public static func containerTopAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerTop(args, rect: alignRightOfPrevious(args, rect: origin(args)))
-    }
-    public static func containerTopAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerTop(args, rect: alignLeftOfPrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │                            │
-    /// │            ┌───────┐       │
-    /// │  ┌───────┐ │ curr  │       │
-    /// │  │ prev  │ │       │       │
-    /// │  └───────┘ └───────┘       │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item to right of the previous along the bottom edge of the container bounds
-    ///
-    public static func containerBottomAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerBottom(args, rect: alignRightOfPrevious(args, rect: origin(args)))
-    }
-    public static func containerBottomAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerBottom(args, rect: alignLeftOfPrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │                            │
-    /// │            ┌───────┐       │
-    /// │  ┌───────┐ │ curr  │       │
-    /// │  │ prev  │ │       │       │
-    /// │  └───────┘ │       │       │
-    /// │            └───────┘       │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item to right of the previous along the centerline of the container bounds
-    ///
-    public static func containerCenterAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerCenterY(args, rect: alignRightOfPrevious(args, rect: origin(args)))
-    }
-    public static func containerCenterAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerCenterY(args, rect: alignLeftOfPrevious(args, rect: origin(args)))
-    }
-    
-    // MARK: - Public (Previous HStack)
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │                            │
-    /// │  ┌───────┐ ┌───────┐       │
-    /// │  │ prev  │ │ curr  │       │
-    /// │  └───────┘ │       │       │
-    /// │            └───────┘       │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item to right of the previous along their top edges
-    ///
-    public static func topAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousTop(args, rect: alignRightOfPrevious(args, rect: origin(args)))
-    }
-    public static func topAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousTop(args, rect: alignLeftOfPrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │            ┌───────┐       │
-    /// │  ┌───────┐ │ curr  │       │
-    /// │  │ prev  │ │       │       │
-    /// │  └───────┘ └───────┘       │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item to right of the previous along the bottom edge of the container bounds
-    ///
-    public static func bottomAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousBottom(args, rect: alignRightOfPrevious(args, rect: origin(args)))
-    }
-    public static func bottomAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousBottom(args, rect: alignLeftOfPrevious(args, rect: origin(args)))
-    }
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │            ┌───────┐       │
-    /// │  ┌───────┐ │ curr  │       │
-    /// │  │ prev  │ │       │       │
-    /// │  └───────┘ │       │       │
-    /// │            └───────┘       │
-    /// │                            │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item to right of the previous along the centerline of the container bounds
-    ///
-    public static func centerAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousCenterY(args, rect: alignRightOfPrevious(args, rect: origin(args)))
-    }
-    public static func centerAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousCenterY(args, rect: alignLeftOfPrevious(args, rect: origin(args)))
-    }
-    
-    // MARK: - Public (Fill)
-    
-    /// ````
-    /// ┌────────────────────────────┐
-    /// │                            │
-    /// │   ┌───────┐ ┌───────────┐  │
-    /// │   │ prev  │ │ curr      │  │
-    /// │   └───────┘ │           │  │
-    /// │             └───────────┘  │
-    /// └────────────────────────────┘
-    ///
-    /// Place an item filling the space between the previous item and container edge
-    ///
-    public static func topAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: alignToPreviousTop(args, rect: containerCroppedRightOfPrevious(args)))
-    }
-    public static func topAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerLeft(args, rect: alignToPreviousTop(args, rect: containerCroppedLeftOfPrevious(args)))
-    }
-    public static func bottomAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: alignToPreviousBottom(args, rect: containerCroppedRightOfPrevious(args)))
-    }
-    public static func bottomAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerLeft(args, rect: alignToPreviousBottom(args, rect: containerCroppedLeftOfPrevious(args)))
-    }
-    public static func centerAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerRight(args, rect: alignToPreviousCenterY(args, rect: containerCroppedRightOfPrevious(args)))
-    }
-    public static func centerAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return extendToContainerLeft(args, rect: alignToPreviousCenterY(args, rect: containerCroppedLeftOfPrevious(args)))
-    }
 
-    // MARK: - Public (Match)
-    
+    // MARK: - Public (Matching)
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌──────────────────────┐  │
@@ -352,7 +35,7 @@ public class SQLayoutCalculators: NSObject {
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right
         let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.padding.top
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.padding.bottom
-        
+
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
     public static func matchContainerFullBleed(_ args: SQFrameCalculatorArgs) -> CGRect {
@@ -360,7 +43,7 @@ public class SQLayoutCalculators: NSObject {
         let r = CGRectGetMaxX(args.container.layoutBounds) - args.padding.right
         let t = CGRectGetMinY(args.container.layoutBounds) + args.padding.top
         let b = CGRectGetMaxY(args.container.layoutBounds) - args.padding.bottom
-        
+
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
 
@@ -374,17 +57,17 @@ public class SQLayoutCalculators: NSObject {
     ///  Match previous item bounds
     public static func matchPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
         guard let previous = args.previous else { return matchContainer(args) }
-        
+
         let l = CGRectGetMinX(previous.contentBounds) - previous.padding.left + args.padding.left
         let r = CGRectGetMaxX(previous.contentBounds) + previous.padding.right - args.padding.right
         let t = CGRectGetMinY(previous.contentBounds) - previous.padding.top + args.padding.top
         let b = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom - args.padding.bottom
-        
+
         return CGRect(x: l, y: t, width: r-l, height: b-t)
     }
-    
+
     // MARK: - Public (Corner/Center aligned)
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -394,7 +77,7 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func containerCenterAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerCenterY(args, rect: alignToContainerCenterX(args, rect: origin(args)))
+        return alignToContainerCenterY(args, rect: alignToContainerCenterX(args, rect: containerTopLeftAligned(args)))
     }
 
     /// ````
@@ -406,9 +89,9 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func containerTopLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerTop(args, rect: alignToContainerLeft(args, rect: origin(args)))
+        return sizedToFit(args, rect: matchContainer(args))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                 ┌───────┐  │
@@ -418,9 +101,9 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func containerTopRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerTop(args, rect: alignToContainerRight(args, rect: origin(args)))
+        return alignToContainerRight(args, rect: containerTopLeftAligned(args))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -430,9 +113,9 @@ public class SQLayoutCalculators: NSObject {
     /// │  └───────┘                 │
     /// └────────────────────────────┘
     public static func containerBottomLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerBottom(args, rect: alignToContainerLeft(args, rect: origin(args)))
+        return alignToContainerBottom(args, rect: containerTopLeftAligned(args))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │                            │
@@ -442,7 +125,94 @@ public class SQLayoutCalculators: NSObject {
     /// │                 └───────┘  │
     /// └────────────────────────────┘
     public static func containerBottomRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToContainerBottom(args, rect: alignToContainerRight(args, rect: origin(args)))
+        return alignToContainerBottom(args, rect: alignToContainerRight(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌──────────────────────┐  │
+    /// │  │ curr                 │  │
+    /// │  └──────────────────────┘  │
+    /// │                            │
+    /// │                            │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+
+    public static func containerWidthTopAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return sizedToFitVertically(args, rect: matchContainer(args))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │                            │
+    /// │                            │
+    /// │                            │
+    /// │  ┌──────────────────────┐  │
+    /// │  │ curr                 │  │
+    /// │  └──────────────────────┘  │
+    /// └────────────────────────────┘
+
+    public static func containerWidthBottomAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerBottom(args, rect: sizedToFitVertically(args, rect: matchContainer(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │                            │
+    /// │  ┌──────────────────────┐  │
+    /// │  │ curr                 │  │
+    /// │  └──────────────────────┘  │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+
+    public static func containerWidthCenterAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterY(args, rect: sizedToFitVertically(args, rect: matchContainer(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌───────┐                 │
+    /// │  │       │                 │
+    /// │  │       │                 │
+    /// │  │ curr  │                 │
+    /// │  │       │                 │
+    /// │  │       │                 │
+    /// │  └───────┘                 │
+    /// └────────────────────────────┘
+    public static func containerHeightLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return sizedToFitHorizontally(args, rect: matchContainer(args))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                 ┌───────┐  │
+    /// │                 │       │  │
+    /// │                 │       │  │
+    /// │                 │ curr  │  │
+    /// │                 │       │  │
+    /// │                 │       │  │
+    /// │                 └───────┘  │
+    /// └────────────────────────────┘
+    public static func containerHeightRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerRight(args, rect: sizedToFitHorizontally(args, rect: matchContainer(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │         ┌───────┐          │
+    /// │         │       │          │
+    /// │         │       │          │
+    /// │         │ curr  │          │
+    /// │         │       │          │
+    /// │         │       │          │
+    /// │         └───────┘          │
+    /// └────────────────────────────┘
+    public static func containerHeightCenterAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterX(args, rect: sizedToFitHorizontally(args, rect: matchContainer(args)))
     }
 
     /// ````
@@ -456,7 +226,7 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func centerAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousCenterY(args, rect: alignToPreviousCenterX(args, rect: origin(args)))
+        return alignToPreviousCenterY(args, rect: alignToPreviousCenterX(args, rect: containerTopLeftAligned(args)))
     }
 
     /// ````
@@ -469,9 +239,9 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func topLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousTop(args, rect: alignToPreviousLeft(args, rect: origin(args)))
+        return alignToPreviousTop(args, rect: alignToPreviousLeft(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌─┌───────┐               │
@@ -482,7 +252,7 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func topRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousTop(args, rect: alignToPreviousRight(args, rect: origin(args)))
+        return alignToPreviousTop(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
     }
     
     /// ````
@@ -495,9 +265,9 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func bottomLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousBottom(args, rect: alignToPreviousLeft(args, rect: origin(args)))
+        return alignToPreviousBottom(args, rect: alignToPreviousLeft(args, rect: containerTopLeftAligned(args)))
     }
-    
+
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌─────────┐               │
@@ -508,9 +278,485 @@ public class SQLayoutCalculators: NSObject {
     /// │                            │
     /// └────────────────────────────┘
     public static func bottomRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousBottom(args, rect: alignToPreviousRight(args, rect: origin(args)))
+        return alignToPreviousBottom(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌──────────┐              │
+    /// │  │   curr   │              │
+    /// │  └──────────┘              │
+    /// │  │   prev   │              │
+    /// │  └──────────┘              │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func widthTopAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return sizedToFitVertically(args, rect: matchPrevious(args))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌──────────┐              │
+    /// │  │   prev   │              │
+    /// │  ┌──────────┐              │
+    /// │  │   curr   │              │
+    /// │  └──────────┘              │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func widthBottomAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: sizedToFitVertically(args, rect: matchPrevious(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌──────────┐              │
+    /// │  ┌──────────┐              │
+    /// │  │   curr   │              │
+    /// │  └──────────┘              │
+    /// │  └──────────┘ prev         │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func widthCenterAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: sizedToFitVertically(args, rect: matchPrevious(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌──────┐───┐              │
+    /// │  |      │   |              │
+    /// │  │ curr │   │              │
+    /// │  |      │   | prev         │
+    /// │  └──────┘───┘              │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func heightLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return sizedToFitHorizontally(args, rect: matchPrevious(args))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌───┌──────┐              │
+    /// │  |   |      |              │
+    /// │  │   | curr │              │
+    /// │  |   |      |              │
+    /// │  └───└──────┘              │
+    /// │  prev                      │
+    /// └────────────────────────────┘
+    public static func heightRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousRight(args , rect: sizedToFitHorizontally(args, rect: matchPrevious(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌─┌──────┐─┐              │
+    /// │  │ |      │ |              │
+    /// │  │ │ curr │ │              │
+    /// │  │ |      │ | prev         │
+    /// │  └─└──────┘─┘              │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func heightCenterAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterX(args, rect: sizedToFitHorizontally(args, rect: matchPrevious(args)))
+    }
+
+    // MARK: - Public (Container VStack)
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌────────┐                │
+    /// │  │ prev   │                │
+    /// │  └────────┘                │
+    /// │  ┌──────────────┐          │
+    /// │  │ curr         │          │
+    /// │  └──────────────┘          │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous along the left edge of the container bounds
+    ///
+    public static func containerLeftAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignBelowPrevious(args, rect: containerTopLeftAligned(args))
+    }
+    public static func containerLeftAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignAbovePrevious(args, rect: containerTopLeftAligned(args))
     }
     
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                ┌────────┐  │
+    /// │                │ prev   │  │
+    /// │                └────────┘  │
+    /// │          ┌──────────────┐  │
+    /// │          │ curr         │  │
+    /// │          └──────────────┘  │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous along the right edge of the container bounds
+    ///
+    public static func containerRightAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerRight(args, rect: alignBelowPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func containerRightAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerRight(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │         ┌────────┐         │
+    /// │         │ prev   │         │
+    /// │         └────────┘         │
+    /// │      ┌──────────────┐      │
+    /// │      │ curr         │      │
+    /// │      └──────────────┘      │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous along the x centerline of the container bounds
+    ///
+    public static func containerCenterAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterX(args, rect: alignBelowPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func containerCenterAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterX(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌──────────────────────┐  │
+    /// │  │ prev                 │  │
+    /// │  └──────────────────────┘  │
+    /// │  ┌──────────────────────┐  │
+    /// │  │ curr                 │  │
+    /// │  └──────────────────────┘  │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous stretched to the full width of the container bounds
+    ///
+    public static func containerWidthVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignBelowPrevious(args, rect: sizedToFitVertically(args, rect: matchContainer(args)))
+    }
+    public static func containerWidthVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignAbovePrevious(args, rect: sizedToFitVertically(args, rect: matchContainer(args)))
+    }
+
+    // MARK: - Public (Previous VStack)
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │         ┌────────┐         │
+    /// │         │ prev   │         │
+    /// │         └────────┘         │
+    /// │         ┌──────────────┐   │
+    /// │         │ curr         │   │
+    /// │         └──────────────┘   │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous aligned on the left edge
+    ///
+    public static func leftAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousLeft(args, rect: alignBelowPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func leftAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousLeft(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │         ┌────────┐         │
+    /// │         │ prev   │         │
+    /// │         └────────┘         │
+    /// │   ┌──────────────┐         │
+    /// │   │ curr         │         │
+    /// │   └──────────────┘         │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous aligned on the right edge
+    ///
+    public static func rightAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousRight(args, rect: alignBelowPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func rightAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousRight(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │       ┌────────┐           │
+    /// │       │ prev   │           │
+    /// │       └────────┘           │
+    /// │    ┌──────────────┐        │
+    /// │    │ curr         │        │
+    /// │    └──────────────┘        │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous along their centerlines
+    ///
+    public static func centerAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterX(args, rect: alignBelowPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func centerAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterX(args, rect: alignAbovePrevious(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │       ┌────────┐           │
+    /// │       │ prev   │           │
+    /// │       └────────┘           │
+    /// │       ┌────────┐           │
+    /// │       │ curr   │           │
+    /// │       └────────┘           │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous matching width
+    ///
+    public static func widthAlignedVStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignBelowPrevious(args, rect: sizedToFitVertically(args, rect: matchPrevious(args)))
+    }
+    public static func widthAlignedVStackUp(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignAbovePrevious(args, rect: sizedToFitVertically(args, rect: matchPrevious(args)))
+    }
+
+    // MARK: - Public (Container HStack)
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌───────┐ ┌───────┐       │
+    /// │  │ prev  │ │ curr  │       │
+    /// │  └───────┘ │       │       │
+    /// │            └───────┘       │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item to right of the previous along the top edge of the container bounds
+    ///
+    public static func containerTopAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignRightOfPrevious(args, rect: containerTopLeftAligned(args))
+    }
+    public static func containerTopAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignLeftOfPrevious(args, rect: containerTopLeftAligned(args))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │            ┌───────┐       │
+    /// │  ┌───────┐ │ curr  │       │
+    /// │  │ prev  │ │       │       │
+    /// │  └───────┘ └───────┘       │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item to right of the previous along the bottom edge of the container bounds
+    ///
+    public static func containerBottomAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerBottom(args, rect: alignRightOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func containerBottomAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerBottom(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │            ┌───────┐       │
+    /// │  ┌───────┐ │ curr  │       │
+    /// │  │ prev  │ │       │       │
+    /// │  └───────┘ │       │       │
+    /// │            └───────┘       │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item to right of the previous along the centerline of the container bounds
+    ///
+    public static func containerCenterAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterY(args, rect: alignRightOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func containerCenterAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterY(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │   ┌───────┐ ┌───────┐      │
+    /// │   │ prev  │ │ curr  │      │
+    /// │   │       │ │       │      │
+    /// │   │       │ │       │      │
+    /// │   │       │ │       │      │
+    /// │   │       │ │       │      │
+    /// │   └───────┘ └───────┘      │
+    /// └────────────────────────────┘
+    public static func containerHeightHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignRightOfPrevious(args, rect: sizedToFitHorizontally(args, rect: matchContainer(args)))
+    }
+    public static func containerHeightHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignLeftOfPrevious(args, rect: sizedToFitHorizontally(args, rect: matchContainer(args)))
+    }
+
+
+    // MARK: - Public (Previous HStack)
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌───────┐ ┌───────┐       │
+    /// │  │ prev  │ │ curr  │       │
+    /// │  └───────┘ │       │       │
+    /// │            └───────┘       │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item to right of the previous along their top edges
+    ///
+    public static func topAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: alignRightOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func topAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │            ┌───────┐       │
+    /// │  ┌───────┐ │ curr  │       │
+    /// │  │ prev  │ │       │       │
+    /// │  └───────┘ └───────┘       │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item to right of the previous along the bottom edge of the container bounds
+    ///
+    public static func bottomAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: alignRightOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func bottomAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │            ┌───────┐       │
+    /// │  ┌───────┐ │ curr  │       │
+    /// │  │ prev  │ │       │       │
+    /// │  └───────┘ │       │       │
+    /// │            └───────┘       │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item to right of the previous along the centerline of the container bounds
+    ///
+    public static func centerAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: alignRightOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    public static func centerAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: alignLeftOfPrevious(args, rect: containerTopLeftAligned(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │   ┌───────┐ ┌───────────┐  │
+    /// │   │ prev  │ │ curr      │  │
+    /// │   └───────┘ └───────────┘  │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item below the previous matching width
+    ///
+    public static func heightAlignedHStack(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignRightOfPrevious(args, rect: sizedToFitHorizontally(args, rect: matchPrevious(args)))
+    }
+    public static func heightAlignedHStackLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignLeftOfPrevious(args, rect: sizedToFitHorizontally(args, rect: matchPrevious(args)))
+    }
+
+    // MARK: - Public (Fill)
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │   ┌───────┐ ┌────────────┐ │
+    /// │   │ prev  │ │ curr       │ │
+    /// │   └───────┘ │            │ │
+    /// │             └────────────┘ │
+    /// └────────────────────────────┘
+    ///
+    /// Place an item filling the space between the previous item and container edge
+    ///
+    public static func topAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: sizedToFitVertically(args, rect: containerRightOfPrevious(args)))
+    }
+    public static func topAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: sizedToFitVertically(args, rect: containerLeftOfPrevious(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │             ┌────────────┐ │
+    /// │   ┌───────┐ │ curr       | |
+    /// │   │ prev  │ │            │ │
+    /// │   └───────┘ └────────────┘ │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    public static func bottomAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: sizedToFitVertically(args, rect: containerRightOfPrevious(args)))
+    }
+    public static func bottomAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: sizedToFitVertically(args, rect: containerLeftOfPrevious(args)))
+    }
+    
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │             ┌────────────┐ │
+    /// │   ┌───────┐ │ curr       | |
+    /// │   │ prev  │ │            │ │
+    /// │   └───────┘ │            │ │
+    /// │             └────────────┘ │
+    /// └────────────────────────────┘
+    ///
+    public static func centerAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: sizedToFitVertically(args, rect: containerRightOfPrevious(args)))
+    }
+    public static func centerAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: sizedToFitVertically(args, rect: containerLeftOfPrevious(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │   ┌───────┐ ┌────────────┐ │
+    /// │   │ prev  │ │ curr       │ │
+    /// │   └───────┘ └────────────┘ │
+    /// │                            │
+    /// └────────────────────────────┘
+    ///
+    public static func heightAlignedFillToRight(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: cropToPreviousHeight(args, rect: containerRightOfPrevious(args)))
+    }
+    public static func heightAlignedFillToLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: cropToPreviousHeight(args, rect: containerLeftOfPrevious(args)))
+    }
+
+
     // MARK: - Public (Flow)
     
     /// ````
@@ -549,7 +795,14 @@ public class SQLayoutCalculators: NSObject {
         }
         return rect
     }
-    
+    public static func heightAlignedFlow(_ args: SQFrameCalculatorArgs) -> CGRect {
+        var rect = heightAlignedHStack(args)
+        if CGRectGetMaxX(rect) + args.padding.right > CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right {
+            rect = cropToPreviousHeight(args, rect: containerLeftAlignedVStack(args))
+        }
+        return rect
+    }
+
     // MARK: - Restricted to part of container on one side of previous
 
     /// ````
@@ -561,33 +814,31 @@ public class SQLayoutCalculators: NSObject {
     /// │  │       │                 │
     /// │  │       │                 │
     /// │  └───────┘                 │
-    /// │                            │
     /// └────────────────────────────┘
     ///
-    public static func containerCroppedLeftOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
-        guard let previous = args.previous else { return matchContainer(args) }
+    public static func containerLeftOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        let baseRect = matchContainer(args)
+        let shiftedRect = alignLeftOfPrevious(args, rect: baseRect)
 
-        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
-        let r = CGRectGetMinX(previous.contentBounds) - previous.padding.left - max(previous.spacing.left, args.spacing.right)
-        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
-        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
-
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
-        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(t + args.padding.top, l + args.padding.left, r - l - args.padding.left - args.padding.right, size.height)
+        return CGRectMake(CGRectGetMinX(baseRect), CGRectGetMinY(baseRect), CGRectGetMaxX(shiftedRect) - CGRectGetMinX(baseRect), CGRectGetHeight(baseRect))
     }
 
-    public static func containerCroppedRightOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
-        guard let previous = args.previous else { return matchContainer(args) }
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │            ┌────────────┐  │
+    /// │  ┌───────┐ │ curr       │  │
+    /// │  │ prev  │ │            │  │
+    /// │  └───────┘ │            │  │
+    /// │            │            │  │
+    /// │            │            │  │
+    /// │            └────────────┘  │
+    /// └────────────────────────────┘
+    ///
+    public static func containerRightOfPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        let baseRect = matchContainer(args)
+        let shiftedRect = alignRightOfPrevious(args, rect: baseRect)
 
-        let l = CGRectGetMaxX(previous.contentBounds) + previous.padding.right + max(previous.spacing.right, args.spacing.left)
-        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
-        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
-        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
-
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
-        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake( l + args.padding.left, t + args.padding.top, r - l - args.padding.left - args.padding.right, size.height)
+        return CGRectMake(CGRectGetMinX(shiftedRect), CGRectGetMinY(baseRect), CGRectGetMaxX(baseRect) - CGRectGetMinX(shiftedRect), CGRectGetHeight(baseRect))
     }
 
     /// ````
@@ -602,54 +853,65 @@ public class SQLayoutCalculators: NSObject {
     /// │            └───────┘       │
     /// └────────────────────────────┘
     ///
-    public static func containerCroppedAbovePrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
-        guard let previous = args.previous else { return matchContainer(args) }
+    public static func containerAbovePrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        let baseRect = matchContainer(args)
+        let shiftedRect = alignAbovePrevious(args, rect: baseRect)
 
-        let t = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
-        let b = CGRectGetMinY(previous.contentBounds) - previous.padding.top - max(previous.spacing.top, args.spacing.bottom)
-        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
-        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
-
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
-        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(l + args.padding.left, t + args.padding.top, size.width, b - t - args.padding.top - args.padding.bottom)
+        return CGRectMake(CGRectGetMinX(baseRect), CGRectGetMinY(baseRect), CGRectGetWidth(baseRect), CGRectGetMaxY(shiftedRect) - CGRectGetMinY(baseRect))
     }
 
-    public static func containerCroppedBelowPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
-        guard let previous = args.previous else { return matchContainer(args) }
-
-        let t = CGRectGetMaxY(previous.contentBounds) + previous.padding.bottom + max(previous.spacing.bottom, args.spacing.top)
-        let b = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
-        let l = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
-        let r = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
-
-        let fittingSize = itemFittingSizeForSize(CGSizeMake(r - l, b - t), padding: args.padding)
-        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: fittingSize)) ?? .zero
-        return CGRectMake(l + args.padding.left, t + args.padding.top, size.width, b - t - args.padding.top - args.padding.bottom)
-    }
-
-    // MARK: - Private
-    
-    // Return the fitting size to be used when sizing items to fit in the container.
-    // Inset by container and insets and any padding specified by the item so we have
-    // space to add them back later.
-    private static func itemFittingSizeForContainer(_ container: SQContainerDescription, padding: UIEdgeInsets) -> CGSize {
-        let width = CGRectGetWidth(container.layoutBounds) - container.layoutInsets.left - container.layoutInsets.right
-        let height = CGRectGetHeight(container.layoutBounds) - container.layoutInsets.top - container.layoutInsets.bottom
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │            ┌───────┐       │
+    /// │            │ prev  │       │
+    /// │            └───────┘       │
+    /// │  ┌──────────────────────┐  │
+    /// │  │                      │  │
+    /// │  │       curr           │  │
+    /// │  │                      │  │
+    /// │  └──────────────────────┘  │
+    /// └────────────────────────────┘
+    ///
+    public static func containerBelowPrevious(_ args: SQFrameCalculatorArgs) -> CGRect {
+        let baseRect = matchContainer(args)
+        let shiftedRect = alignBelowPrevious(args, rect: baseRect)
         
-        return itemFittingSizeForSize(CGSizeMake(width, height), padding: padding)
+        return CGRectMake(CGRectGetMinX(baseRect), CGRectGetMinY(shiftedRect), CGRectGetWidth(baseRect), CGRectGetMaxY(baseRect) - CGRectGetMinY(shiftedRect))
+    }
+}
+
+///
+/// Methods that transform item frames to help make custom frame calculator variations
+///
+extension SQLayoutCalculators {
+
+    // MARK: - Sizing to fit
+
+    // Return bounds for item sized to fit within given bounds (which have already been
+    // adjusted for padding)
+    public static func sizedToFit(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+        let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: rect.size)) ?? .zero
+
+        return CGRectMake(rect.origin.x, rect.origin.y, size.width, size.height)
     }
     
-    private static func itemFittingSizeForSize(_ size: CGSize, padding: UIEdgeInsets) -> CGSize {
-        let width = size.width - padding.left - padding.right
-        let height = size.height - padding.top - padding.bottom
+    public static func sizedToFitVertically(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+        var sizedRect = sizedToFit(args, rect: CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, CGFloat.greatestFiniteMagnitude))
         
-        return CGSizeMake(width, height)
+        sizedRect.size.width = rect.size.width
+        return sizedRect
     }
     
-    // MARK: - Private (spacing relative to previous convenience utilities)
+    public static func sizedToFitHorizontally(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+        var sizedRect = sizedToFit(args, rect: CGRectMake(rect.origin.x, rect.origin.y, CGFloat.greatestFiniteMagnitude, rect.size.height))
+        
+        sizedRect.size.height = rect.size.height
+        return sizedRect
+    }
     
-    private static func alignAbovePrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    // MARK: - Aligning next to previous
+    
+    public static func alignAbovePrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerBottom(args, rect: rect) }
         
         var rect = rect
@@ -657,7 +919,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignBelowPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignBelowPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerTop(args, rect: rect) }
         
         var rect = rect
@@ -665,7 +927,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignLeftOfPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignLeftOfPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerRight(args, rect: rect) }
         
         var rect = rect
@@ -673,41 +935,41 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignRightOfPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignRightOfPrevious(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerLeft(args, rect: rect) }
         
         var rect = rect
         rect.origin.x = CGRectGetMaxX(previous.contentBounds) + previous.padding.right + max(previous.spacing.right, args.spacing.left) + args.padding.left
         return rect
     }
-
-    // MARK: - Private (re-alignment to container convenience utilities)
     
-    private static func alignToContainerTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    // MARK: - Aligning to container edges
+
+    public static func alignToContainerTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.y = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top + args.padding.top
         return rect
     }
     
-    private static func alignToContainerLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToContainerLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.x = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.padding.left
         return rect
     }
     
-    private static func alignToContainerBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToContainerBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.y = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom - args.padding.bottom - CGRectGetHeight(rect)
         return rect
     }
     
-    private static func alignToContainerRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToContainerRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         rect.origin.x = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right - CGRectGetWidth(rect)
         return rect
     }
     
-    private static func alignToContainerCenterX(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToContainerCenterX(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         let left = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left
         let right = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right
@@ -717,7 +979,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignToContainerCenterY(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToContainerCenterY(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var rect = rect
         let top = CGRectGetMinY(args.container.layoutBounds) + args.container.layoutInsets.top
         let bottom = CGRectGetMaxY(args.container.layoutBounds) - args.container.layoutInsets.bottom
@@ -727,9 +989,9 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    // MARK: - Private (re-alignment to previous convenience utilities)
+    // MARK: - Aligning to previous edges
     
-    private static func alignToPreviousTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToPreviousTop(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerTop(args, rect: rect) }
         
         var rect = rect
@@ -737,7 +999,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignToPreviousLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToPreviousLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerLeft(args, rect: rect) }
         
         var rect = rect
@@ -745,7 +1007,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignToPreviousBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToPreviousBottom(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerBottom(args, rect: rect) }
         
         var rect = rect
@@ -753,7 +1015,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignToPreviousRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToPreviousRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerRight(args, rect: rect) }
         
         var rect = rect
@@ -761,7 +1023,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignToPreviousCenterX(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToPreviousCenterX(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerCenterX(args, rect: rect) }
         
         var rect = rect
@@ -773,7 +1035,7 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
     
-    private static func alignToPreviousCenterY(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+    public static func alignToPreviousCenterY(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         guard let previous = args.previous else { return alignToContainerCenterY(args, rect: rect) }
         
         var rect = rect
@@ -785,23 +1047,19 @@ public class SQLayoutCalculators: NSObject {
         return rect
     }
 
-    // MARK: - Private (extend to container bounds)
-
-    public static func extendToContainerRight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
-        var rect = rect
-        let right = CGRectGetMaxX(args.container.layoutBounds) - args.container.layoutInsets.right - args.padding.right
+    public static func cropToPreviousHeight(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+        guard let previous = args.previous else { return rect }
         
-        rect.size.width = right - CGRectGetMinX(rect)
+        var rect = rect
+        rect.size.height = CGRectGetHeight(previous.contentBounds) + previous.padding.top + previous.padding.bottom - args.padding.top - args.padding.bottom
         return rect
     }
 
-    private static func extendToContainerLeft(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
-        var rect = rect
-        let left = CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left + args.padding.left
-        let diff = CGRectGetMinX(rect) - left
+    public static func cropToPreviousWidth(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
+        guard let previous = args.previous else { return rect }
         
-        rect.origin.x -= diff
-        rect.size.width += diff
+        var rect = rect
+        rect.size.width = CGRectGetWidth(previous.contentBounds) + previous.padding.left + previous.padding.right - args.padding.left - args.padding.right
         return rect
     }
 }
