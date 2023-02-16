@@ -46,6 +46,7 @@ public class SQLayoutContainer: NSObject {
 
         let container = SQContainerDescription(layoutBounds: bounds, layoutInsets: insets)
         var previous: SQPreviousItemDescription?
+        var previousToPrevious: SQPreviousItemDescription?
         var occupiedBounds = CGRect.zero
         var debugPrefix = ""
 
@@ -73,7 +74,7 @@ public class SQLayoutContainer: NSObject {
             let spacing = item.sq_spacingCalculator?(SQSpacingCalculatorArgs(item: item, container: container)) ?? .zero
             let padding = item.sq_paddingCalculator?(SQPaddingCalculatorArgs(item: item, container: container)) ?? .zero
             let frameCalculator = (forSizingOnly ? item.sq_sizingFrameCalculator : nil) ?? item.sq_frameCalculator ?? SQLayoutCalculators.leftAlignedVStack
-            let frame = frameCalculator(SQFrameCalculatorArgs(item: item, padding: padding, spacing: spacing, container: container, previous: previous, forSizingOnly: forSizingOnly))
+            let frame = frameCalculator(SQFrameCalculatorArgs(item: item, padding: padding, spacing: spacing, container: container, previous: previous, previousToPrevious: previousToPrevious, forSizingOnly: forSizingOnly))
 
             // Call layout observer with generated frame
             item.sq_layoutObserver?(SQLayoutObserverArgs(item: item, frame: frame, forSizingOnly: forSizingOnly))
@@ -99,6 +100,7 @@ public class SQLayoutContainer: NSObject {
 
             // Update "previous" variable for next item
             if options.saveAsPrevious {
+                previousToPrevious = previous
                 previous = SQPreviousItemDescription(item: item, contentBounds: frame, spacing: spacing, padding: padding)
             }
         }

@@ -89,6 +89,14 @@ public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
 @objc
 public extension NSObject {
 
+    // Convenience method to add initialization code for an
+    // item created in a chain.  To fetch the original object
+    // downcast item.sq_rootItem
+    @discardableResult
+    func withSQCustomization(_ customization: @escaping (_ item: SQMutableLayoutItem) -> Void) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { customization($0) }
+    }
+
     // MARK: - Public Decorators (closures)
     func withSQSizeCalculator(_ c: @escaping SQSizeCalculator) -> NSObject & SQLayoutItem {
         return mutableLayoutItem() { $0.mutable_sq_sizeCalculator = c }

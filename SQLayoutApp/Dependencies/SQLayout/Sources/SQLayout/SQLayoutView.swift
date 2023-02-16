@@ -67,7 +67,7 @@ public class SQLayoutView: UIView {
     /// Convenience factory method for creating an auto-sizing layoutView added as a subview to a parent view
     ///
     @discardableResult
-    public static func addAutosizedView(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero) -> SQLayoutView {
+    public static func addAutosizedView(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero, ignoreTopAnchor: Bool = false) -> SQLayoutView {
         let contentView = SQLayoutView(layoutInsets: layoutInsets)
 
         // Add content view as subview
@@ -76,15 +76,19 @@ public class SQLayoutView: UIView {
 
         // Set constraints
         if let layoutGuide = layoutGuide {
+            if !ignoreTopAnchor {
+                contentView.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
+            }
             NSLayoutConstraint.activate([
-                contentView.topAnchor.constraint(equalTo: layoutGuide.topAnchor),
                 contentView.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor),
                 contentView.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor),
                 contentView.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor)
             ])
         } else {
+            if !ignoreTopAnchor {
+                contentView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            }
             NSLayoutConstraint.activate([
-                contentView.topAnchor.constraint(equalTo: view.topAnchor),
                 contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
                 contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -177,6 +181,16 @@ public class SQLayoutView: UIView {
     @discardableResult
     public func containingLayoutInsets(_ insets: UIEdgeInsets) -> SQLayoutView {
         return containingLayoutInsetsCalculator({ _ in insets })
+    }
+
+    ///
+    /// Convenience method for inserting customization code for
+    /// a layout view created in a chain of ".containingXXX" methods
+    ///
+    @discardableResult
+    public func containingCustomization(_ customization: (SQLayoutView) -> Void) -> SQLayoutView {
+        customization(self)
+        return self
     }
 
     // MARK: - Public (Decorator Defaults)
@@ -290,6 +304,19 @@ public class SQLayoutView: UIView {
     public override var intrinsicContentSize: CGSize {
         return sizeThatFits(CGSizeMake(CGFloat.greatestFiniteMagnitude, CGFloat.greatestFiniteMagnitude))
     }
+
+    public override func setNeedsLayout() {
+        super.setNeedsLayout()
+
+        // Recurse down setNeedsLayout() calls to nested views
+        // to ensure everything gets recalculated even if
+        // frames don't change since content may have changed.
+        for item in self.container.arrangedItems {
+            if let layoutView = item.sq_rootItem as? SQLayoutView {
+                layoutView.setNeedsLayout()
+            }
+        }
+    }
 }
 
 ///
@@ -300,7 +327,6 @@ public class SQLayoutView: UIView {
 extension UIView {
 
     // MARK: - SQLayoutItem
-
     override public var sq_sizeCalculator: SQSizeCalculator? {
         return (self.superview as? SQLayoutView)?.defaultSizeCalculator ?? { [weak self] args in
             // Override to default to sizeThatFits for size calculation

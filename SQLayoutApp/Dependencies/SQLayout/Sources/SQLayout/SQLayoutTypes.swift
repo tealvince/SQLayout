@@ -85,8 +85,9 @@ public class SQFrameCalculatorArgs: NSObject {
     public let spacing: UIEdgeInsets
     public let container: SQContainerDescription
     public var previous: SQPreviousItemDescription?
+    public var previousToPrevious: SQPreviousItemDescription?
     public let forSizingOnly: Bool
-    init(item: SQLayoutItem, padding: UIEdgeInsets, spacing: UIEdgeInsets, container: SQContainerDescription, previous: SQPreviousItemDescription? = nil, forSizingOnly: Bool) {
+    init(item: SQLayoutItem, padding: UIEdgeInsets, spacing: UIEdgeInsets, container: SQContainerDescription, previous: SQPreviousItemDescription? = nil, previousToPrevious: SQPreviousItemDescription? = nil, forSizingOnly: Bool) {
         self.item = item
         self.padding = padding
         self.spacing = spacing
