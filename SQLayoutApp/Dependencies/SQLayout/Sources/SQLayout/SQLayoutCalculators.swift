@@ -844,6 +844,34 @@ public class SQLayoutCalculators: NSObject {
         }
         return rect
     }
+    public static func topAlignedFlowLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        var rect = topAlignedHStackLeft(args)
+        if CGRectGetMinX(rect) - args.padding.right < CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left {
+            rect = containerRightAlignedVStack(args)
+        }
+        return rect
+    }
+    public static func bottomAlignedFlowLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        var rect = bottomAlignedHStackLeft(args)
+        if CGRectGetMinX(rect) - args.padding.right < CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left {
+            rect = containerRightAlignedVStack(args)
+        }
+        return rect
+    }
+    public static func centerAlignedFlowLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        var rect = centerAlignedHStackLeft(args)
+        if CGRectGetMinX(rect) - args.padding.right < CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left {
+            rect = containerRightAlignedVStack(args)
+        }
+        return rect
+    }
+    public static func heightAlignedFlowLeft(_ args: SQFrameCalculatorArgs) -> CGRect {
+        var rect = heightAlignedHStackLeft(args)
+        if CGRectGetMinX(rect) - args.padding.right < CGRectGetMinX(args.container.layoutBounds) + args.container.layoutInsets.left {
+            rect = cropToPreviousHeight(args, rect: containerRightAlignedVStack(args))
+        }
+        return rect
+    }
 
     // MARK: - Restricted to part of container on one side of previous
 

@@ -21,98 +21,102 @@ class MainViewController: UIViewController {
 
     // Table of all calculators for cycling slideshow demo
     private let allCalculators = [
-        // matching
-        "1 matchContainer" : SQLayoutCalculators.matchContainer,
-        "2 matchContainerFullBleed" : SQLayoutCalculators.matchContainerFullBleed,
-        "3 matchPrevious" : SQLayoutCalculators.matchPrevious,
-
-        // in-container
-        "4 containerCenterAligned" : SQLayoutCalculators.containerCenterAligned,
-        "5 containerTopLeftAligned" : SQLayoutCalculators.containerTopLeftAligned,
-        "6 containerTopRightAligned" : SQLayoutCalculators.containerTopRightAligned,
-        "7 containerBottomLeftAligned" : SQLayoutCalculators.containerBottomLeftAligned,
-        "8 containerBottomRightAligned" : SQLayoutCalculators.containerBottomRightAligned,
-        "9 containerWidthTopAligned" : SQLayoutCalculators.containerWidthTopAligned,
-        "10 containerWidthBottomAligned" : SQLayoutCalculators.containerWidthBottomAligned,
-        "11 containerWidthCenterAligned" : SQLayoutCalculators.containerWidthCenterAligned,
-        "12 containerHeightLeftAligned" : SQLayoutCalculators.containerHeightLeftAligned,
-        "13 containerHeightRightAligned" : SQLayoutCalculators.containerHeightRightAligned,
-        "14 containerHeightCenterAligned" : SQLayoutCalculators.containerHeightCenterAligned,
-
-        // in-previous
-        "15 centerAligned" : SQLayoutCalculators.centerAligned,
-        "16 topLeftAligned" : SQLayoutCalculators.topLeftAligned,
-        "17 topRightAligned" : SQLayoutCalculators.topRightAligned,
-        "18 bottomLeftAligned" : SQLayoutCalculators.bottomLeftAligned,
-        "19 bottomRightAligned" : SQLayoutCalculators.bottomRightAligned,
-        "20 widthTopAligned" : SQLayoutCalculators.widthTopAligned,
-        "21 widthBottomAligned" : SQLayoutCalculators.widthBottomAligned,
-        "22 widthCenterAligned" : SQLayoutCalculators.widthCenterAligned,
-        "23 heightLeftAligned" : SQLayoutCalculators.heightLeftAligned,
-        "24 heightRightAligned" : SQLayoutCalculators.heightRightAligned,
-        "25 heightCenterAligned" : SQLayoutCalculators.heightCenterAligned,
-
-        // vstack (container)
-        "26 containerLeftAlignedVStack" : SQLayoutCalculators.containerLeftAlignedVStack,
-        "27 containerLeftAlignedVStackUp" : SQLayoutCalculators.containerLeftAlignedVStackUp,
-        "28 containerRightAlignedVStack" : SQLayoutCalculators.containerRightAlignedVStack,
-        "29 containerRightAlignedVStackUp" : SQLayoutCalculators.containerRightAlignedVStackUp,
-        "30 containerCenterAlignedVStack" : SQLayoutCalculators.containerCenterAlignedVStack,
-        "31 containerCenterAlignedVStackUp" : SQLayoutCalculators.containerCenterAlignedVStackUp,
-        "32 containerWidthVStack" : SQLayoutCalculators.containerWidthVStack,
-        "33 containerWidthVStackUp" : SQLayoutCalculators.containerWidthVStackUp,
-
         // vstack (previous)
-        "34 leftAlignedVStack" : SQLayoutCalculators.leftAlignedVStack,
-        "35 leftAlignedVStackUp" : SQLayoutCalculators.leftAlignedVStackUp,
-        "36 rightAlignedVStack" : SQLayoutCalculators.rightAlignedVStack,
-        "37 rightAlignedVStackUp" : SQLayoutCalculators.rightAlignedVStackUp,
-        "38 centerAlignedVStack" : SQLayoutCalculators.centerAlignedVStack,
-        "39 centerAlignedVStackUp" : SQLayoutCalculators.centerAlignedVStackUp,
-        "40 widthAlignedVStack" : SQLayoutCalculators.widthAlignedVStack,
-        "41 widthAlignedVStackUp" : SQLayoutCalculators.widthAlignedVStackUp,
-
-        // hstack (container)
-        "42 containerTopAlignedHStack" : SQLayoutCalculators.containerTopAlignedHStack,
-        "43 containerTopAlignedHStackLeft" : SQLayoutCalculators.containerTopAlignedHStackLeft,
-        "44 containerBottomAlignedHStack" : SQLayoutCalculators.containerBottomAlignedHStack,
-        "45 containerBottomAlignedHStackLeft" : SQLayoutCalculators.containerBottomAlignedHStackLeft,
-        "46 containerCenterAlignedHStack" : SQLayoutCalculators.containerCenterAlignedHStack,
-        "47 containerCenterAlignedHStackLeft" : SQLayoutCalculators.containerCenterAlignedHStackLeft,
-        "48 containerHeightHStack" : SQLayoutCalculators.containerHeightHStack,
-        "49 containerHeightHStackLeft" : SQLayoutCalculators.containerHeightHStackLeft,
+        "1 widthAlignedVStack" : SQLayoutCalculators.widthAlignedVStack,
+        "2 leftAlignedVStack" : SQLayoutCalculators.leftAlignedVStack,
+        "3 rightAlignedVStack" : SQLayoutCalculators.rightAlignedVStack,
+        "4 centerAlignedVStack" : SQLayoutCalculators.centerAlignedVStack,
+        "5 widthAlignedVStackUp" : SQLayoutCalculators.widthAlignedVStackUp,
+        "6 leftAlignedVStackUp" : SQLayoutCalculators.leftAlignedVStackUp,
+        "7 rightAlignedVStackUp" : SQLayoutCalculators.rightAlignedVStackUp,
+        "8 centerAlignedVStackUp" : SQLayoutCalculators.centerAlignedVStackUp,
 
         // hstack (previous)
-        "50 topAlignedHStack" : SQLayoutCalculators.topAlignedHStack,
-        "51 topAlignedHStackLeft" : SQLayoutCalculators.topAlignedHStackLeft,
-        "52 bottomAlignedHStack" : SQLayoutCalculators.bottomAlignedHStack,
-        "53 bottomAlignedHStackLeft" : SQLayoutCalculators.bottomAlignedHStackLeft,
-        "54 centerAlignedHStack" : SQLayoutCalculators.centerAlignedHStack,
-        "55 centerAlignedHStackLeft" : SQLayoutCalculators.centerAlignedHStackLeft,
-        "56 heightAlignedHStack" : SQLayoutCalculators.heightAlignedHStack,
-        "57 heightAlignedHStackLeft" : SQLayoutCalculators.heightAlignedHStackLeft,
+        "9 heightAlignedHStack" : SQLayoutCalculators.heightAlignedHStack,
+        "10 topAlignedHStack" : SQLayoutCalculators.topAlignedHStack,
+        "11 bottomAlignedHStack" : SQLayoutCalculators.bottomAlignedHStack,
+        "12 centerAlignedHStack" : SQLayoutCalculators.centerAlignedHStack,
+        "13 heightAlignedHStackLeft" : SQLayoutCalculators.heightAlignedHStackLeft,
+        "14 topAlignedHStackLeft" : SQLayoutCalculators.topAlignedHStackLeft,
+        "15 bottomAlignedHStackLeft" : SQLayoutCalculators.bottomAlignedHStackLeft,
+        "16 centerAlignedHStackLeft" : SQLayoutCalculators.centerAlignedHStackLeft,
 
-        // fill
-        "58 topAlignedFillToRight" : SQLayoutCalculators.topAlignedFillToRight,
-        "59 topAlignedFillToLeft" : SQLayoutCalculators.topAlignedFillToLeft,
-        "60 bottomAlignedFillToRight" : SQLayoutCalculators.bottomAlignedFillToRight,
-        "61 bottomAlignedFillToLeft" : SQLayoutCalculators.bottomAlignedFillToLeft,
-        "62 centerAlignedFillToRight" : SQLayoutCalculators.centerAlignedFillToRight,
-        "63 centerAlignedFillToLeft" : SQLayoutCalculators.centerAlignedFillToLeft,
-        "64 heightAlignedFillToRight" : SQLayoutCalculators.heightAlignedFillToRight,
-        "65 heightAlignedFillToLeft" : SQLayoutCalculators.heightAlignedFillToLeft,
+        // vstack (container)
+        "17 containerWidthVStack" : SQLayoutCalculators.containerWidthVStack,
+        "18 containerLeftAlignedVStack" : SQLayoutCalculators.containerLeftAlignedVStack,
+        "19 containerRightAlignedVStack" : SQLayoutCalculators.containerRightAlignedVStack,
+        "20 containerCenterAlignedVStack" : SQLayoutCalculators.containerCenterAlignedVStack,
+        "21 containerWidthVStackUp" : SQLayoutCalculators.containerWidthVStackUp,
+        "22 containerLeftAlignedVStackUp" : SQLayoutCalculators.containerLeftAlignedVStackUp,
+        "23 containerRightAlignedVStackUp" : SQLayoutCalculators.containerRightAlignedVStackUp,
+        "24 containerCenterAlignedVStackUp" : SQLayoutCalculators.containerCenterAlignedVStackUp,
+
+        // hstack (container)
+        "25 containerHeightHStack" : SQLayoutCalculators.containerHeightHStack,
+        "26 containerTopAlignedHStack" : SQLayoutCalculators.containerTopAlignedHStack,
+        "27 containerBottomAlignedHStack" : SQLayoutCalculators.containerBottomAlignedHStack,
+        "28 containerCenterAlignedHStack" : SQLayoutCalculators.containerCenterAlignedHStack,
+        "29 containerHeightHStackLeft" : SQLayoutCalculators.containerHeightHStackLeft,
+        "30 containerTopAlignedHStackLeft" : SQLayoutCalculators.containerTopAlignedHStackLeft,
+        "31 containerBottomAlignedHStackLeft" : SQLayoutCalculators.containerBottomAlignedHStackLeft,
+        "32 containerCenterAlignedHStackLeft" : SQLayoutCalculators.containerCenterAlignedHStackLeft,
 
         // flow
-        "66 topAlignedFlow" : SQLayoutCalculators.topAlignedFlow,
-        "67 bottomAlignedFlow" : SQLayoutCalculators.bottomAlignedFlow,
-        "68 centerAlignedFlow" : SQLayoutCalculators.centerAlignedFlow,
-        "69 heightAlignedFlow" : SQLayoutCalculators.heightAlignedFlow,
+        "33 heightAlignedFlow" : SQLayoutCalculators.heightAlignedFlow,
+        "34 topAlignedFlow" : SQLayoutCalculators.topAlignedFlow,
+        "35 bottomAlignedFlow" : SQLayoutCalculators.bottomAlignedFlow,
+        "36 centerAlignedFlow" : SQLayoutCalculators.centerAlignedFlow,
+        "37 heightAlignedFlowLeft" : SQLayoutCalculators.heightAlignedFlowLeft,
+        "38 topAlignedFlowLeft" : SQLayoutCalculators.topAlignedFlowLeft,
+        "39 bottomAlignedFlowLeft" : SQLayoutCalculators.bottomAlignedFlowLeft,
+        "40 centerAlignedFlowLeft" : SQLayoutCalculators.centerAlignedFlowLeft,
+
+        // fill
+        "41 heightAlignedFillToRight" : SQLayoutCalculators.heightAlignedFillToRight,
+        "42 topAlignedFillToRight" : SQLayoutCalculators.topAlignedFillToRight,
+        "43 bottomAlignedFillToRight" : SQLayoutCalculators.bottomAlignedFillToRight,
+        "44 centerAlignedFillToRight" : SQLayoutCalculators.centerAlignedFillToRight,
+        "45 heightAlignedFillToLeft" : SQLayoutCalculators.heightAlignedFillToLeft,
+        "46 topAlignedFillToLeft" : SQLayoutCalculators.topAlignedFillToLeft,
+        "47 bottomAlignedFillToLeft" : SQLayoutCalculators.bottomAlignedFillToLeft,
+        "48 centerAlignedFillToLeft" : SQLayoutCalculators.centerAlignedFillToLeft,
+
+        // in-previous
+        "49 centerAligned" : SQLayoutCalculators.centerAligned,
+        "50 topLeftAligned" : SQLayoutCalculators.topLeftAligned,
+        "51 topRightAligned" : SQLayoutCalculators.topRightAligned,
+        "52 bottomLeftAligned" : SQLayoutCalculators.bottomLeftAligned,
+        "53 bottomRightAligned" : SQLayoutCalculators.bottomRightAligned,
+        "54 widthTopAligned" : SQLayoutCalculators.widthTopAligned,
+        "55 widthBottomAligned" : SQLayoutCalculators.widthBottomAligned,
+        "56 widthCenterAligned" : SQLayoutCalculators.widthCenterAligned,
+        "57 heightLeftAligned" : SQLayoutCalculators.heightLeftAligned,
+        "58 heightRightAligned" : SQLayoutCalculators.heightRightAligned,
+        "59 heightCenterAligned" : SQLayoutCalculators.heightCenterAligned,
 
         // between container/previous
-        "70 containerLeftOfPrevious" : SQLayoutCalculators.containerLeftOfPrevious,
-        "71 containerRightOfPrevious" : SQLayoutCalculators.containerRightOfPrevious,
-        "72 containerAbovePrevious" : SQLayoutCalculators.containerAbovePrevious,
-        "73 containerBelowPrevious" : SQLayoutCalculators.containerBelowPrevious,
+        "60 containerLeftOfPrevious" : SQLayoutCalculators.containerLeftOfPrevious,
+        "61 containerRightOfPrevious" : SQLayoutCalculators.containerRightOfPrevious,
+        "62 containerAbovePrevious" : SQLayoutCalculators.containerAbovePrevious,
+        "63 containerBelowPrevious" : SQLayoutCalculators.containerBelowPrevious,
+
+        // in-container
+        "64 containerCenterAligned" : SQLayoutCalculators.containerCenterAligned,
+        "65 containerTopLeftAligned" : SQLayoutCalculators.containerTopLeftAligned,
+        "66 containerTopRightAligned" : SQLayoutCalculators.containerTopRightAligned,
+        "67 containerBottomLeftAligned" : SQLayoutCalculators.containerBottomLeftAligned,
+        "68 containerBottomRightAligned" : SQLayoutCalculators.containerBottomRightAligned,
+        "69 containerWidthTopAligned" : SQLayoutCalculators.containerWidthTopAligned,
+        "70 containerWidthBottomAligned" : SQLayoutCalculators.containerWidthBottomAligned,
+        "71 containerWidthCenterAligned" : SQLayoutCalculators.containerWidthCenterAligned,
+        "72 containerHeightLeftAligned" : SQLayoutCalculators.containerHeightLeftAligned,
+        "73 containerHeightRightAligned" : SQLayoutCalculators.containerHeightRightAligned,
+        "74 containerHeightCenterAligned" : SQLayoutCalculators.containerHeightCenterAligned,
+
+        // matching
+        "75 matchPrevious" : SQLayoutCalculators.matchPrevious,
+        "76 matchContainer" : SQLayoutCalculators.matchContainer,
+        "77 matchContainerFullBleed" : SQLayoutCalculators.matchContainerFullBleed,
     ]
 
     // Keys sorted in order above
@@ -149,8 +153,13 @@ class MainViewController: UIViewController {
         let topWrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
             .makeBorderless(color: UIColor.white)
         let bottomWrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)).makeBorderless(color: UIColor.white)
-        let nextLabel = createTestView("", blue.withAlphaComponent(0.85))
+        let nextLabel = createTestView("", green.withAlphaComponent(0.85))
+        let nextLabel2 = createTestView("", blue.withAlphaComponent(0.85))
         var nextCalculator = allCalculators[calculatorKeys.first!]!
+        let nextSizeCalculator: SQSizeCalculator = { args in
+            // cap width to it doesn't overflow off screen (we can always read the name)
+            return SQLayoutCalculators.viewSizeCalculator(maxSize: CGSizeMake(args.container.layoutBounds.width/2 - (args.item.sq_rootItem == nextLabel ? 70 : 50), CGFloat.greatestFiniteMagnitude))(args)
+        }
 
         //
         // Create an autosizing content view automatically added to view.
@@ -277,18 +286,24 @@ class MainViewController: UIViewController {
                 .containingArrangedItem(createTestView("prev", yellow)
                     .withSQFrameCalculator(SQLayoutCalculators.containerCenterAligned)
                     .withSQSize(CGSizeMake(50, 50))
-                    .withSQSpacing(UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5))
                 )
                 // Dynamic "next" object
                 .containingArrangedItem(nextLabel
-                    .withSQFrameCalculator({ args in
-                        return nextCalculator(args)
-                    })
-                    // cap width to it doesn't overflow off screen (we can always read the name)
-                    .withSQSizeCalculator({ args in
-                        return SQLayoutCalculators.viewSizeCalculator(maxSize: CGSizeMake(args.container.layoutBounds.width/2-10, CGFloat.greatestFiniteMagnitude))(args)
-                    })
+                    .withSQFrameCalculator({ args in return nextCalculator(args)})
+                    .withSQSizeCalculator(nextSizeCalculator)
                 )
+                .containingArrangedItem(nextLabel2
+                    .withSQFrameCalculator({ args in
+                        var rect = nextCalculator(args)
+                        if !args.forSizingOnly {
+                            // Hide if small since doubling up some calculators (like fill ones) doesn't make sense
+                            (args.item.sq_rootItem as? UILabel)?.alpha = (rect.width <= 5 || rect.height <= 5) ? 0:1
+                        }
+                        return rect
+                    })
+                    .withSQSizeCalculator(nextSizeCalculator)
+                )
+                .containingDefaultSpacing(UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5))
                 .withSQFrameCalculator(SQLayoutCalculators.containerBelowPrevious)
                 .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0))
             )
@@ -299,11 +314,12 @@ class MainViewController: UIViewController {
         var nextCounter = 0
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            nextCounter += 1
             let key = self.calculatorKeys[nextCounter % self.calculatorKeys.count]
             nextLabel.text = key.components(separatedBy: " ")[1]
+            nextLabel2.text = key.components(separatedBy: " ")[1]
             nextCalculator = self.allCalculators[key]!
             bottomWrapper.setNeedsLayout()
+            nextCounter += 1
         }
         timer?.fire()
     }

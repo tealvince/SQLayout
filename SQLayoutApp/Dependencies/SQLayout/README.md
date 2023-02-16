@@ -180,13 +180,13 @@ Note that the "with...()" decorator methods can be applied to any layoutItem and
 
 ## Advanced topics
 
-### Sizing
+### Autosizing
 
 SQLayoutViews themselves support sizeThatFits, which in turn powers the default size calculator when the layout view is nested as an item inside another layout view.  To calculate size automatically, the layout view does a "dry" layout into the fitting bounds given and returns the size of the smallest bounds containing all the arranged subviews in the test layout.  
 
-While this works for many use cases, it can break if the enclosed subviews can expand based on the size of the enclosing container.  For instance, if a layout contains both left-aligned and right-aligned members, the resulting calculated size will always grow to the full width of the size passed in.
+While this works for many use cases, it can break if the enclosed subviews can expand based on the size of the enclosing container.  For instance, if a layout contains both left-aligned and right-aligned members, the resulting calculated size will always grow to the full width of the fitting size passed in.  While this prevents proper autosizing to "minimum" bounds, it is not an issue when a layout view is set to known finite bounds (such as screen size) and laying out to use all available space is the desired effect.
 
-To avoid this, one can optionally specify a different frame calculator for use only during sizing operations.  By keeping consistent alignment, automatic sizing can still be used.  For example, consider a horizontal row of items that we want to be aligned by their vertical centers, but with one item that should be top-aligned:
+To avoid support size calculation in the above case, one can optionally specify a different frame calculator for use only during sizing operations.  By keeping consistent alignment, automatic size calculation can still be used.  For example, consider a horizontal row of items that we want to be aligned by their vertical centers, but with one item that should be top-aligned:
 
     let rowLayoutView = SQLayoutView()
         .containingArrangedItem(iconImageView)
