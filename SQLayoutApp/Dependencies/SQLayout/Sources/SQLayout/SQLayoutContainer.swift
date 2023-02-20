@@ -73,7 +73,7 @@ public class SQLayoutContainer: NSObject {
             // Calculate spacing, padding, frame
             let spacing = item.sq_spacingCalculator?(SQSpacingCalculatorArgs(item: item, container: container)) ?? .zero
             let padding = item.sq_paddingCalculator?(SQPaddingCalculatorArgs(item: item, container: container)) ?? .zero
-            let frameCalculator = (forSizingOnly ? item.sq_sizingFrameCalculator : nil) ?? item.sq_frameCalculator ?? SQLayoutCalculators.leftAlignedVStack
+            let frameCalculator = (forSizingOnly ? item.sq_sizingFrameCalculator : nil) ?? item.sq_frameCalculator ?? SQLayoutCalculators.containerLeftAlignedVStack
             let frame = frameCalculator(SQFrameCalculatorArgs(item: item, padding: padding, spacing: spacing, container: container, previous: previous, previousToPrevious: previousToPrevious, forSizingOnly: forSizingOnly))
 
             // Call layout observer with generated frame

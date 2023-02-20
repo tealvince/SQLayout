@@ -19,6 +19,15 @@ class MainViewController: UIViewController {
     private let blue = UIColor(red: 0.45, green: 0.72, blue: 1, alpha: 1)
     private let purple = UIColor(red: 0.75, green: 0.50, blue: 1.0, alpha: 1)
 
+    private var nextCounter = 0
+    // Make some view that we'll need to reference directly
+    private let topWrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
+        .makeBorderless(color: UIColor.white)
+    private let bottomWrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)).makeBorderless(color: UIColor.white)
+    private lazy var nextLabel = { createTestView("", green.withAlphaComponent(0.85)) }()
+    private lazy var nextLabel2 = { createTestView("", blue.withAlphaComponent(0.85)) }()
+    private var nextCalculator = SQLayoutCalculators.widthAlignedVStack
+
     // Table of all calculators for cycling slideshow demo
     private let allCalculators = [
         // vstack (previous)
@@ -84,39 +93,47 @@ class MainViewController: UIViewController {
         // in-previous
         "49 centerAligned" : SQLayoutCalculators.centerAligned,
         "50 topLeftAligned" : SQLayoutCalculators.topLeftAligned,
-        "51 topRightAligned" : SQLayoutCalculators.topRightAligned,
-        "52 bottomLeftAligned" : SQLayoutCalculators.bottomLeftAligned,
-        "53 bottomRightAligned" : SQLayoutCalculators.bottomRightAligned,
-        "54 widthTopAligned" : SQLayoutCalculators.widthTopAligned,
-        "55 widthBottomAligned" : SQLayoutCalculators.widthBottomAligned,
-        "56 widthCenterAligned" : SQLayoutCalculators.widthCenterAligned,
-        "57 heightLeftAligned" : SQLayoutCalculators.heightLeftAligned,
-        "58 heightRightAligned" : SQLayoutCalculators.heightRightAligned,
-        "59 heightCenterAligned" : SQLayoutCalculators.heightCenterAligned,
+        "51 centerTopAligned" : SQLayoutCalculators.centerTopAligned,
+        "52 topRightAligned" : SQLayoutCalculators.topRightAligned,
+        "53 centerRightAligned" : SQLayoutCalculators.centerRightAligned,
+        "54 bottomRightAligned" : SQLayoutCalculators.bottomRightAligned,
+        "55 centerBottomAligned" : SQLayoutCalculators.centerBottomAligned,
+        "56 bottomLeftAligned" : SQLayoutCalculators.bottomLeftAligned,
+        "57 centerLeftAligned" : SQLayoutCalculators.centerLeftAligned,
+        "58 widthTopAligned" : SQLayoutCalculators.widthTopAligned,
+        "59 widthBottomAligned" : SQLayoutCalculators.widthBottomAligned,
+        "60 widthCenterAligned" : SQLayoutCalculators.widthCenterAligned,
+        "61 heightLeftAligned" : SQLayoutCalculators.heightLeftAligned,
+        "62 heightRightAligned" : SQLayoutCalculators.heightRightAligned,
+        "63 heightCenterAligned" : SQLayoutCalculators.heightCenterAligned,
 
         // between container/previous
-        "60 containerLeftOfPrevious" : SQLayoutCalculators.containerLeftOfPrevious,
-        "61 containerRightOfPrevious" : SQLayoutCalculators.containerRightOfPrevious,
-        "62 containerAbovePrevious" : SQLayoutCalculators.containerAbovePrevious,
-        "63 containerBelowPrevious" : SQLayoutCalculators.containerBelowPrevious,
+        "64 containerLeftOfPrevious" : SQLayoutCalculators.containerLeftOfPrevious,
+        "65 containerRightOfPrevious" : SQLayoutCalculators.containerRightOfPrevious,
+        "66 containerAbovePrevious" : SQLayoutCalculators.containerAbovePrevious,
+        "67 containerBelowPrevious" : SQLayoutCalculators.containerBelowPrevious,
 
         // in-container
-        "64 containerCenterAligned" : SQLayoutCalculators.containerCenterAligned,
-        "65 containerTopLeftAligned" : SQLayoutCalculators.containerTopLeftAligned,
-        "66 containerTopRightAligned" : SQLayoutCalculators.containerTopRightAligned,
-        "67 containerBottomLeftAligned" : SQLayoutCalculators.containerBottomLeftAligned,
-        "68 containerBottomRightAligned" : SQLayoutCalculators.containerBottomRightAligned,
-        "69 containerWidthTopAligned" : SQLayoutCalculators.containerWidthTopAligned,
-        "70 containerWidthBottomAligned" : SQLayoutCalculators.containerWidthBottomAligned,
-        "71 containerWidthCenterAligned" : SQLayoutCalculators.containerWidthCenterAligned,
-        "72 containerHeightLeftAligned" : SQLayoutCalculators.containerHeightLeftAligned,
-        "73 containerHeightRightAligned" : SQLayoutCalculators.containerHeightRightAligned,
-        "74 containerHeightCenterAligned" : SQLayoutCalculators.containerHeightCenterAligned,
+        "68 containerCenterAligned" : SQLayoutCalculators.containerCenterAligned,
+        "69 containerTopLeftAligned" : SQLayoutCalculators.containerTopLeftAligned,
+        "70 containerCenterTopAligned" : SQLayoutCalculators.containerCenterTopAligned,
+        "71 containerTopRightAligned" : SQLayoutCalculators.containerTopRightAligned,
+        "72 containerCenterRightAligned" : SQLayoutCalculators.containerCenterRightAligned,
+        "73 containerBottomRightAligned" : SQLayoutCalculators.containerBottomRightAligned,
+        "74 containerCenterBottomAligned" : SQLayoutCalculators.containerCenterBottomAligned,
+        "75 containerBottomLeftAligned" : SQLayoutCalculators.containerBottomLeftAligned,
+        "76 containerCenterLeftAligned" : SQLayoutCalculators.containerCenterLeftAligned,
+        "77 containerWidthTopAligned" : SQLayoutCalculators.containerWidthTopAligned,
+        "78 containerWidthBottomAligned" : SQLayoutCalculators.containerWidthBottomAligned,
+        "79 containerWidthCenterAligned" : SQLayoutCalculators.containerWidthCenterAligned,
+        "80 containerHeightLeftAligned" : SQLayoutCalculators.containerHeightLeftAligned,
+        "81 containerHeightRightAligned" : SQLayoutCalculators.containerHeightRightAligned,
+        "82 containerHeightCenterAligned" : SQLayoutCalculators.containerHeightCenterAligned,
 
         // matching
-        "75 matchPrevious" : SQLayoutCalculators.matchPrevious,
-        "76 matchContainer" : SQLayoutCalculators.matchContainer,
-        "77 matchContainerFullBleed" : SQLayoutCalculators.matchContainerFullBleed,
+        "83 matchPrevious" : SQLayoutCalculators.matchPrevious,
+        "84 matchContainer" : SQLayoutCalculators.matchContainer,
+        "85 matchContainerFullBleed" : SQLayoutCalculators.matchContainerFullBleed,
     ]
 
     // Keys sorted in order above
@@ -132,33 +149,13 @@ class MainViewController: UIViewController {
         return titleLabel
     }()
 
-    // Create a label as a test view
-    private func createTestView(_ s: String, _ col: UIColor) -> UILabel {
-        let view = UILabel()
-        view.text = s
-        view.backgroundColor = col
-        view.textAlignment = .center
-        view.numberOfLines = 0
-        view.lineBreakMode = .byCharWrapping
-        view.layer.cornerRadius = 4
-        view.clipsToBounds = true
-        return view
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.black
 
-        // Make some view that we'll need to reference directly
-        let topWrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
-            .makeBorderless(color: UIColor.white)
-        let bottomWrapper = SQLayoutView(layoutInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)).makeBorderless(color: UIColor.white)
-        let nextLabel = createTestView("", green.withAlphaComponent(0.85))
-        let nextLabel2 = createTestView("", blue.withAlphaComponent(0.85))
-        var nextCalculator = allCalculators[calculatorKeys.first!]!
-        let nextSizeCalculator: SQSizeCalculator = { args in
+        let nextSizeCalculator: SQSizeCalculator = { [weak self] args in
             // cap width to it doesn't overflow off screen (we can always read the name)
-            return SQLayoutCalculators.viewSizeCalculator(maxSize: CGSizeMake(args.container.layoutBounds.width/2 - (args.item.sq_rootItem == nextLabel ? 70 : 50), CGFloat.greatestFiniteMagnitude))(args)
+            return SQLayoutCalculators.viewSizeCalculator(maxSize: CGSizeMake(args.container.layoutBounds.width/2 - (args.item.sq_rootItem == self?.nextLabel ? 70 : 50), CGFloat.greatestFiniteMagnitude))(args)
         }
 
         //
@@ -289,12 +286,12 @@ class MainViewController: UIViewController {
                 )
                 // Dynamic "next" object
                 .containingArrangedItem(nextLabel
-                    .withSQFrameCalculator({ args in return nextCalculator(args)})
+                    .withSQFrameCalculator({ [weak self] args in return self?.nextCalculator(args) ?? .zero })
                     .withSQSizeCalculator(nextSizeCalculator)
                 )
                 .containingArrangedItem(nextLabel2
-                    .withSQFrameCalculator({ args in
-                        var rect = nextCalculator(args)
+                    .withSQFrameCalculator({ [weak self] args in
+                        let rect = self?.nextCalculator(args) ?? .zero
                         if !args.forSizingOnly {
                             // Hide if small since doubling up some calculators (like fill ones) doesn't make sense
                             (args.item.sq_rootItem as? UILabel)?.alpha = (rect.width <= 5 || rect.height <= 5) ? 0:1
@@ -311,17 +308,41 @@ class MainViewController: UIViewController {
         //
         // Set a timer that increments the calculator used by the "next" item every two seconds
         //
-        var nextCounter = 0
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            let key = self.calculatorKeys[nextCounter % self.calculatorKeys.count]
-            nextLabel.text = key.components(separatedBy: " ")[1]
-            nextLabel2.text = key.components(separatedBy: " ")[1]
-            nextCalculator = self.allCalculators[key]!
-            bottomWrapper.setNeedsLayout()
-            nextCounter += 1
+            self?.advanceNextCalculator()
         }
         timer?.fire()
+
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(slideshowTapped))
+        bottomWrapper.addGestureRecognizer(tapRecognizer)
+    }
+
+    // MARK: - Private
+    @objc
+    private func slideshowTapped() {
+        timer?.fire()
+    }
+
+    private func advanceNextCalculator() {
+        let key = self.calculatorKeys[nextCounter % self.calculatorKeys.count]
+        nextLabel.text = key.components(separatedBy: " ")[1]
+        nextLabel2.text = key.components(separatedBy: " ")[1]
+        nextCalculator = self.allCalculators[key]!
+        bottomWrapper.setNeedsLayout()
+        nextCounter += 1
+    }
+
+    // Create a label as a test view
+    private func createTestView(_ s: String, _ col: UIColor) -> UILabel {
+        let view = UILabel()
+        view.text = s
+        view.backgroundColor = col
+        view.textAlignment = .center
+        view.numberOfLines = 0
+        view.lineBreakMode = .byCharWrapping
+        view.layer.cornerRadius = 4
+        view.clipsToBounds = true
+        return view
     }
 }
 

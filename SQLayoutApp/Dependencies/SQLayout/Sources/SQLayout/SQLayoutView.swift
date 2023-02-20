@@ -329,6 +329,11 @@ extension UIView {
     // MARK: - SQLayoutItem
     override public var sq_sizeCalculator: SQSizeCalculator? {
         return (self.superview as? SQLayoutView)?.defaultSizeCalculator ?? { [weak self] args in
+            // Fix calculation of UILabel handle wrapping properly
+            if let label = args.item.sq_rootItem as? UILabel, let text = label.text, let font = label.font {
+                return text.boundingRect(with: args.fittingSize, options: [.usesLineFragmentOrigin], attributes: [.font: font], context: nil).size
+            }
+
             // Override to default to sizeThatFits for size calculation
             return self?.sizeThatFits(args.fittingSize) ?? .zero
         }

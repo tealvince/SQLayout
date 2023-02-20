@@ -172,6 +172,55 @@ public class SQLayoutCalculators: NSObject {
 
     /// ````
     /// ┌────────────────────────────┐
+    /// │                            │
+    /// │  ┌───────┐                 │
+    /// │  │ curr  │                 │
+    /// │  └───────┘                 │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func containerCenterLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterY(args, rect: sizedToFit(args, rect: matchContainer(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │                 ┌───────┐  │
+    /// │                 │ curr  │  │
+    /// │                 └───────┘  │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func containerCenterRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterY(args, rect: alignToContainerRight(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │         ┌───────┐          │
+    /// │         │ curr  │          │
+    /// │         └───────┘          │
+    /// │                            │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func containerCenterTopAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerCenterX(args, rect: containerTopLeftAligned(args))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │                            │
+    /// │                            │
+    /// │         ┌───────┐          │
+    /// │         │ curr  │          │
+    /// │         └───────┘          │
+    /// └────────────────────────────┘
+    public static func containerCenterBottomAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToContainerBottom(args, rect: alignToContainerCenterX(args, rect: containerTopLeftAligned(args)))
+    }
+
+
+    /// ````
+    /// ┌────────────────────────────┐
     /// │  ┌──────────────────────┐  │
     /// │  │ curr                 │  │
     /// │  └──────────────────────┘  │
@@ -286,6 +335,19 @@ public class SQLayoutCalculators: NSObject {
 
     /// ````
     /// ┌────────────────────────────┐
+    /// │  ┌┌───────┐┐               │
+    /// │  │| curr  ││               │
+    /// │  |└───────┘│               │
+    /// │  │ prev    │               │
+    /// │  └─────────┘               │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func centerTopAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousTop(args, rect: alignToPreviousCenterX(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
     /// │  ┌─┌───────┐               │
     /// │  │ │ curr  │               │
     /// │  │ └───────┘               │
@@ -295,6 +357,45 @@ public class SQLayoutCalculators: NSObject {
     /// └────────────────────────────┘
     public static func topRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
         return alignToPreviousTop(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌─────────┐               │
+    /// │  | ┌───────┐               │
+    /// │  │ │ curr  │               │
+    /// │  │ └───────┘               │
+    /// │  └─────────┘               │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func centerRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌─────────┐               │
+    /// │  │ prev    │               │
+    /// │  │ ┌───────┐               │
+    /// │  │ │ curr  │               │
+    /// │  └─└───────┘               │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func bottomRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
+    }
+
+    /// ````
+    /// ┌────────────────────────────┐
+    /// │  ┌─────────┐               │
+    /// │  │ prev    │               │
+    /// │  │┌───────┐|               │
+    /// │  ││ curr  │|               │
+    /// │  └└───────┘┘               │
+    /// │                            │
+    /// └────────────────────────────┘
+    public static func centerBottomAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousBottom(args, rect: alignToPreviousCenterX(args, rect: containerTopLeftAligned(args)))
     }
 
     /// ````
@@ -313,14 +414,14 @@ public class SQLayoutCalculators: NSObject {
     /// ````
     /// ┌────────────────────────────┐
     /// │  ┌─────────┐               │
-    /// │  │ prev    │               │
-    /// │  │ ┌───────┐               │
-    /// │  │ │ curr  │               │
-    /// │  └─└───────┘               │
+    /// │  ┌───────┐ │               │
+    /// │  │ curr  │ │               │
+    /// │  └───────┘ │               │
+    /// │  └─────────┘               │
     /// │                            │
     /// └────────────────────────────┘
-    public static func bottomRightAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
-        return alignToPreviousBottom(args, rect: alignToPreviousRight(args, rect: containerTopLeftAligned(args)))
+    public static func centerLeftAligned(_ args: SQFrameCalculatorArgs) -> CGRect {
+        return alignToPreviousCenterY(args, rect: alignToPreviousLeft(args, rect: containerTopLeftAligned(args)))
     }
 
     /// ````
@@ -962,12 +1063,14 @@ extension SQLayoutCalculators {
     public static func sizedToFit(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         let size = args.item.sq_sizeCalculator?(SQSizeCalculatorArgs(item: args.item, container: args.container, fittingSize: rect.size)) ?? .zero
 
+        // Constrain vertically and horizontally but allow to contract within
         return CGRectMake(rect.origin.x, rect.origin.y, size.width, size.height)
     }
 
     public static func sizedToFitVertically(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var sizedRect = sizedToFit(args, rect: CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, CGFloat.greatestFiniteMagnitude))
 
+        // Constrain horizontally but allow to expand vertically
         sizedRect.size.width = rect.size.width
         return sizedRect
     }
@@ -975,6 +1078,7 @@ extension SQLayoutCalculators {
     public static func sizedToFitHorizontally(_ args: SQFrameCalculatorArgs, rect: CGRect) -> CGRect {
         var sizedRect = sizedToFit(args, rect: CGRectMake(rect.origin.x, rect.origin.y, CGFloat.greatestFiniteMagnitude, rect.size.height))
 
+        // Constrain vertically but allow to expand horizontally
         sizedRect.size.height = rect.size.height
         return sizedRect
     }
