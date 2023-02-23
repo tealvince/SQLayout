@@ -29,11 +29,11 @@ import UIKit
 ///
 @objcMembers
 public class SQLayoutContainer: NSObject {
-    public static var debugEnabled = false
-    private static var nestLevel = 0
 
     public var arrangedItems: [SQLayoutItem] = []
     public let maxDimension: CGFloat = 10000    // clip fitting sizes to reasonable values to prevent overflows
+    public static var debugEnabled = false
+    private static var nestLevel = 0
 
     // Lays out all arranged items and returns the bounding
     // rectangle that contains all of their content rects.

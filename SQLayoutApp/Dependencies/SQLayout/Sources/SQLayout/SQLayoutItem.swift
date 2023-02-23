@@ -46,7 +46,7 @@ public protocol SQMutableLayoutItem: SQLayoutItem {
 public class SQMutableProxyLayoutItem: NSObject, SQMutableLayoutItem {
 
     // MARK: - Initializer
-    init(rootItem: NSObject) {
+    public init(rootItem: NSObject) {
         self.mutable_sq_rootItem = rootItem.sq_rootItem ?? rootItem
     }
 
@@ -149,6 +149,20 @@ public extension NSObject {
     }
 }
 
+
+public extension NSObject {
+
+    // Swift-only version of convenience method to add initialization
+    // code taking the root item as an argument instead of a layoutItem
+    @discardableResult
+    func withSQCustomization<T>(_ customization: @escaping (_ item: T) -> Void) -> NSObject & SQLayoutItem {
+        return mutableLayoutItem() { item in
+            if let item = item.sq_rootItem as? T {
+                customization(item)
+            }
+        }
+    }
+}
 
 ///
 /// Add default properties for layout items

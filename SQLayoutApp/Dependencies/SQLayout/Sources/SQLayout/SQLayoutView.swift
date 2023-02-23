@@ -28,20 +28,20 @@ public typealias SQLayoutViewInsetsCalculator = (SQLayoutView) -> UIEdgeInsets
 public class SQLayoutView: UIView {
 
     // MARK: - Public properties
-    var layoutInsetsCalculator: SQLayoutViewInsetsCalculator? = nil
-    var layoutInsets: UIEdgeInsets { get { layoutInsetsCalculator?(self) ?? .zero } set { layoutInsetsCalculator = {_ in newValue } } }
+    public var layoutInsetsCalculator: SQLayoutViewInsetsCalculator? = nil
+    public var layoutInsets: UIEdgeInsets { get { layoutInsetsCalculator?(self) ?? .zero } set { layoutInsetsCalculator = {_ in newValue } } }
 
     /// Default calculators for arranged items (if not specifically set by item decorator)
-    var defaultSizeCalculator: SQSizeCalculator?
-    var defaultFrameCalculator: SQFrameCalculator?
-    var defaultSizingFrameCalculator: SQFrameCalculator?
-    var defaultSpacingCalculator: SQSpacingCalculator?
-    var defaultPaddingCalculator: SQPaddingCalculator?
-    var defaultLayoutOptionsCalculator: SQLayoutOptionsCalculator?
-    var defaultLayoutObserver: SQLayoutObserver?
+    public var defaultSizeCalculator: SQSizeCalculator?
+    public var defaultFrameCalculator: SQFrameCalculator?
+    public var defaultSizingFrameCalculator: SQFrameCalculator?
+    public var defaultSpacingCalculator: SQSpacingCalculator?
+    public var defaultPaddingCalculator: SQPaddingCalculator?
+    public var defaultLayoutOptionsCalculator: SQLayoutOptionsCalculator?
+    public var defaultLayoutObserver: SQLayoutObserver?
 
     // MARK: - Private properties
-    let container = SQLayoutContainer()
+    private let container = SQLayoutContainer()
 
     // MARK: - Initializers
     public init(layoutInsetsCalculator: @escaping SQLayoutViewInsetsCalculator) {
@@ -102,7 +102,7 @@ public class SQLayoutView: UIView {
     /// If the item represents a view then add it as a subview as well.
     /// Returns self to support chaining.
     ///
-    public func addArrangedItem(_ item: SQLayoutItem) {
+    public func addArrangedItem(_ item: any SQLayoutItem) {
 
         // Add item to container
         container.arrangedItems.append(item)
@@ -117,7 +117,7 @@ public class SQLayoutView: UIView {
     ///
     /// Remove an arranged item.  If the item represents a view, remove it as subview.
     ///
-    public func removeArrangedItem(_ item: SQLayoutItem) {
+    public func removeArrangedItem(_ item: any SQLayoutItem) {
 
         if let index = container.arrangedItems.firstIndex(where: { $0.sq_rootItem === item.sq_rootItem }) {
             // Remove from container
@@ -167,7 +167,7 @@ public class SQLayoutView: UIView {
     // MARK: - Public (Chaining support)
 
     @discardableResult
-    public func containingArrangedItem(_ item: SQLayoutItem) -> SQLayoutView {
+    public func containingArrangedItem(_ item: any SQLayoutItem) -> SQLayoutView {
         addArrangedItem(item)
         return self
     }
@@ -331,7 +331,9 @@ extension UIView {
         return (self.superview as? SQLayoutView)?.defaultSizeCalculator ?? { [weak self] args in
             // Fix calculation of UILabel handle wrapping properly
             if let label = args.item.sq_rootItem as? UILabel, let text = label.text, let font = label.font {
-                return text.boundingRect(with: args.fittingSize, options: [.usesLineFragmentOrigin], attributes: [.font: font], context: nil).size
+                let maximumObservedLabelWidthRoundoff: CGFloat = 3
+                let size = text.boundingRect(with: args.fittingSize, options: [.usesLineFragmentOrigin], attributes: [.font: font], context: nil).size
+                return CGSizeMake(size.width+maximumObservedLabelWidthRoundoff, size.height)
             }
 
             // Override to default to sizeThatFits for size calculation

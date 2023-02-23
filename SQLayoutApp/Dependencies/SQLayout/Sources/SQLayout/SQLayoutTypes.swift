@@ -20,17 +20,17 @@ import UIKit
 @objcMembers
 public class SQLayoutOptions: NSObject {
     /// When true, this object is ignored during layout
-    let shouldSkipLayout: Bool
+    public let shouldSkipLayout: Bool
 
     /// If true, this object's bounds are ignored when finding the
     /// "occupied" bounds used to calculate a view size.  This is
     /// useful for ignoring background images and other decoration
     /// that is intended to overflow the bounds of a view
-    let shouldIgnoreWhenCalculatingSize: Bool
+    public let shouldIgnoreWhenCalculatingSize: Bool
 
     /// If false, the next layout item will not see us as the "previous" item
     /// This option is useful to layout multiple leaves relative to a common previous node.
-    let saveAsPrevious: Bool
+    public let saveAsPrevious: Bool
     public init(shouldSkipLayout: Bool = false, shouldIgnoreWhenCalculatingSize: Bool = false, saveAsPrevious: Bool = true) {
         self.shouldSkipLayout = shouldSkipLayout
         self.shouldIgnoreWhenCalculatingSize = shouldIgnoreWhenCalculatingSize
@@ -43,7 +43,7 @@ public class SQLayoutOptions: NSObject {
 public class SQContainerDescription: NSObject {
     public let layoutBounds: CGRect
     public let layoutInsets: UIEdgeInsets
-    init(layoutBounds: CGRect, layoutInsets: UIEdgeInsets) {
+    public init(layoutBounds: CGRect, layoutInsets: UIEdgeInsets) {
         self.layoutBounds = layoutBounds
         self.layoutInsets = layoutInsets
     }
@@ -52,11 +52,11 @@ public class SQContainerDescription: NSObject {
 /// Describes the previous item laid out during the sequential layout process
 @objcMembers
 public class SQPreviousItemDescription: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let contentBounds: CGRect
     public let spacing: UIEdgeInsets
     public let padding: UIEdgeInsets
-    init(item: SQLayoutItem, contentBounds: CGRect, spacing: UIEdgeInsets, padding: UIEdgeInsets) {
+    public init(item: any SQLayoutItem, contentBounds: CGRect, spacing: UIEdgeInsets, padding: UIEdgeInsets) {
         self.item = item
         self.contentBounds = contentBounds
         self.spacing = spacing
@@ -67,10 +67,10 @@ public class SQPreviousItemDescription: NSObject {
 /// Arguments passed to size calculators
 @objcMembers
 public class SQSizeCalculatorArgs: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let container: SQContainerDescription
     public let fittingSize: CGSize
-    init(item: SQLayoutItem, container: SQContainerDescription, fittingSize: CGSize) {
+    public init(item: any SQLayoutItem, container: SQContainerDescription, fittingSize: CGSize) {
         self.item = item
         self.container = container
         self.fittingSize = fittingSize
@@ -80,14 +80,14 @@ public class SQSizeCalculatorArgs: NSObject {
 /// Arguments passed to frame calculators
 @objcMembers
 public class SQFrameCalculatorArgs: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let padding: UIEdgeInsets
     public let spacing: UIEdgeInsets
     public let container: SQContainerDescription
     public var previous: SQPreviousItemDescription?
     public var previousToPrevious: SQPreviousItemDescription?
     public let forSizingOnly: Bool
-    init(item: SQLayoutItem, padding: UIEdgeInsets, spacing: UIEdgeInsets, container: SQContainerDescription, previous: SQPreviousItemDescription? = nil, previousToPrevious: SQPreviousItemDescription? = nil, forSizingOnly: Bool) {
+    public init(item: any SQLayoutItem, padding: UIEdgeInsets, spacing: UIEdgeInsets, container: SQContainerDescription, previous: SQPreviousItemDescription? = nil, previousToPrevious: SQPreviousItemDescription? = nil, forSizingOnly: Bool) {
         self.item = item
         self.padding = padding
         self.spacing = spacing
@@ -100,9 +100,9 @@ public class SQFrameCalculatorArgs: NSObject {
 /// Arguments passed to Spacing calculators
 @objcMembers
 public class SQSpacingCalculatorArgs: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let container: SQContainerDescription
-    init(item: SQLayoutItem, container: SQContainerDescription) {
+    public init(item: any SQLayoutItem, container: SQContainerDescription) {
         self.item = item
         self.container = container
     }
@@ -111,9 +111,9 @@ public class SQSpacingCalculatorArgs: NSObject {
 /// Arguments passed Padding calculators
 @objcMembers
 public class SQPaddingCalculatorArgs: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let container: SQContainerDescription
-    init(item: SQLayoutItem, container: SQContainerDescription) {
+    public init(item: any SQLayoutItem, container: SQContainerDescription) {
         self.item = item
         self.container = container
     }
@@ -122,9 +122,9 @@ public class SQPaddingCalculatorArgs: NSObject {
 /// Arguments passed LayoutOptions calculators
 @objcMembers
 public class SQLayoutOptionsCalculatorArgs: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let container: SQContainerDescription
-    init(item: SQLayoutItem, container: SQContainerDescription) {
+    public init(item: any SQLayoutItem, container: SQContainerDescription) {
         self.item = item
         self.container = container
     }
@@ -133,10 +133,10 @@ public class SQLayoutOptionsCalculatorArgs: NSObject {
 /// Arguments passed to Layout observers
 @objcMembers
 public class SQLayoutObserverArgs: NSObject {
-    public let item: SQLayoutItem
+    public let item: any SQLayoutItem
     public let frame: CGRect
     public let forSizingOnly: Bool
-    init(item: SQLayoutItem, frame: CGRect, forSizingOnly: Bool) {
+    public init(item: any SQLayoutItem, frame: CGRect, forSizingOnly: Bool) {
         self.item = item
         self.frame = frame
         self.forSizingOnly = forSizingOnly
