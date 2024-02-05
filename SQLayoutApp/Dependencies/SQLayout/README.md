@@ -136,6 +136,8 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
 
 ## Tutorial
 
+The following example code demonstrates how to use sequential layout to create a simple prompt view.  Each of the sub-views is added to the layoutView one at-a-time.  While doing so, each can be decorated with a method call to customize how to place or size it relative to the container or the previous sub-view.
+ 
 ```
     // First, we create a layout view and add it as an autosized subview 
     // of our view.  We can do this manually, but here we use a convenience
