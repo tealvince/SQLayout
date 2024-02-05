@@ -1,12 +1,18 @@
 # SQLayout
 
-Sequential Layout Views or iOS
+Sequential Layout Views for iOS
 Vince Lee  
 
 Created: Feb 7, 2023  
-Updated: Feb 11, 2023
+Updated: Feb 5, 2024
 
-Sequential Layout is system for laying out UIKit views using a declarative syntax that is highly readable and encourages code reuse.  It breaks out the code normally used to manually size and layout views into blocks that are attached as decorators to arranged subviews.  These blocks retain all the flexibility of manual layout while encouraging reuse that simplifies and accelerates development.
+## What it is
+
+Sequential Layout is container view for laying out UIKit views using a declarative syntax that is highly readable and encourages code reuse.  It breaks out the code normally used to manually size and layout views into blocks that are attached as decorators to arranged subviews.  These blocks retain all the flexibility of manual layout while encouraging reuse that simplifies and accelerates development.
+
+## What it isn't
+
+Sequential Layout isn't a typical layout "system" per-se, in that it does not define a fixed set of components or layout methods/options that a user must use.  Instead, it only defines a single flexible layout container view (SQLayoutView) which works with any UIView subviews (or itself as a subview within existing UIViews) and whose functionality is almost entirely defined via decorator blocks defined by the user.  While a large set of predefined blocks are provided for convenience, one is free to use them, compose them, or ignore them in favor of custom code.
 
 ## How it works
 
@@ -26,9 +32,9 @@ Typical layout code usually looks something like the following.  The views to la
         ....
     }
 
-With Sequential Layout views, a container wrapper view (SQLayoutView) contains and manages one or more arrangedItems.  It enumerates over its arranged subviews when layoutSubviews is called, but unlike other container-based layout methods, the logic resides with each subview, not with the container.  
+With Sequential Layout views, a container wrapper view (SQLayoutView) contains and manages one or more arrangedItems.  It enumerates over its arranged subviews when layoutSubviews is called, but unlike other container-based layout methods, the logic resides with code associated with each subview, not with the container.
 
-Instead, each arranged subview defines its own behavior based on "calculator" blocks that decorate it.  These calculators define the layout, sizing, spacing, and insets of each view.  Since each calculator is passed the information it needs in a modular way, the calculators are usually reusable and can often replaced with a set of premade standard calculators defined in SQLayoutCalculators.  They can still be defined with custom code, however, or made by composing existing calculators to handle unique edge cases.
+Instead, each arranged subview defines its own behavior based on "calculator" blocks that decorate it.  Note that calculator blocks are specified when a subview is added to the layout container view, and thus don't require subclassing or modifying the subviews themselves.  These calculators define the layout, sizing, spacing, and insets of each view.  Since each calculator is passed the information it needs in a modular way, the calculators are usually reusable and can often replaced with a set of premade standard calculators defined in SQLayoutCalculators.  They can still be defined with custom code, however, or made by composing existing calculators to handle unique edge cases.
 
 ## Example
 
@@ -53,6 +59,19 @@ The following is a simple example of five subviews, two vertically stacked label
         .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
     )
 
+
+   ┌────────────────────────────┐
+   │  Title Label               │
+   │  Subtitle Label            │
+   │                            │
+   │  ┌──────────┐ ┌─────────┐  │
+   │  │   skip   │ │   more  │  │  <-- flow layout places as many on line as will fit, then wraps
+   │  └──────────┘ └─────────┘  │
+   │  ┌────────────┐            │
+   │  │   cancel   │            │
+   │  └────────────┘            │
+   └────────────────────────────┘
+
 The code above is all that is needed to add views that layout in the content view and for the content view to calculate a size to fit its contents.  In fact, since containerLeftAlignedVStack is the default frame calculator, this can be simplified using an optional "chaining" methods in SQLayoutView into a single statement:
 
     let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
@@ -72,7 +91,7 @@ In addition to providing a readable alternative to manual layout, Sequential Lay
 
 * Easily readable declarative format - designed for a set-it-and-forget-it approach
 
-* UIKit Support - supports existing subclasses of UIView directly without adapters or additional view controllers
+* UIKit Support - supports existing subclasses of UIView directly without adapters or additional view controllers or modifying views
 
 * Objective C - supports Objective-C
 
@@ -143,6 +162,16 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
         .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
     )
 
+   ┌────────────────────────────┐
+   │  Title Label               │
+   │  Subtitle Label            │
+   │  ┌──────────────────────┐  │
+   │  │     action button    │  │
+   │  └──────────────────────┘  │
+   │                            │
+   │        Footer Label        │
+   └────────────────────────────┘
+
 The code above is spaced out to describe each step individually.  Alternatively, we can use the containingArrangedItem() chaining method to simplify the above code. At the same time, let's say we want to space out the items vertically by 10 px, except for the space above the footer which we'll keep at 20.  We can do this with the containingDefaultSpacing() chaining method on the layoutView:
 
     let layoutView = SQLayoutView.addAutosizedView(to: self.view, layoutInsets: .zero)
@@ -175,6 +204,16 @@ Now let's say we want to support multiple action buttons, and have the row of th
             .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
         )
         .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+
+   ┌────────────────────────────┐
+   │  Title Label               │
+   │  Subtitle Label            │
+   │    ┌────┐ ┌────┐ ┌────┐    │
+   │    │act1│ │act2│ │act3│    │  <-- use nesting to center row of buttons together as a unit
+   │    └────┘ └────┘ └────┘    │
+   │                            │
+   │        Footer Label        │
+   └────────────────────────────┘
 
 Note that the "with...()" decorator methods can be applied to any layoutItem and determine their layout inside an enclosing layoutView, while the "containing...()" methods only apply to the layoutView containers themselves and set defaults for all layoutItems inside.  In this example, the buttons are wrapped by a layoutView that is itself also a layoutItem, so it has both "with..." and "containing..." methods called on it.
 

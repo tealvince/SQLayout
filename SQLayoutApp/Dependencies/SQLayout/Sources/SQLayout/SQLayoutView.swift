@@ -9,6 +9,7 @@
 import UIKit
 
 public typealias SQLayoutViewInsetsCalculator = (SQLayoutView) -> UIEdgeInsets
+public typealias SQLayoutViewCallback = (SQLayoutView) -> Void
 
 ///
 /// A container view that supports sequential layout on subviews
@@ -31,6 +32,13 @@ public class SQLayoutView: UIView {
     public var layoutInsetsCalculator: SQLayoutViewInsetsCalculator? = nil
     public var layoutInsets: UIEdgeInsets { get { layoutInsetsCalculator?(self) ?? .zero } set { layoutInsetsCalculator = {_ in newValue } } }
 
+    // Set to true to disable handling of taps in this view while still allowing
+    // userInteractionEnabled, which may still be desirable for keyboard handling, etc
+    public var isPointNeverInside = false
+
+    /// Convenience property to add additional behavior after view is laid out, such as updating coordinating views
+    public var didLayoutSubviewsCallback: SQLayoutViewCallback?
+
     /// Default calculators for arranged items (if not specifically set by item decorator)
     public var defaultSizeCalculator: SQSizeCalculator?
     public var defaultFrameCalculator: SQFrameCalculator?
@@ -44,7 +52,7 @@ public class SQLayoutView: UIView {
     private let container = SQLayoutContainer()
 
     // MARK: - Initializers
-    public init(layoutInsetsCalculator: @escaping SQLayoutViewInsetsCalculator) {
+    public required init(layoutInsetsCalculator: @escaping SQLayoutViewInsetsCalculator) {
         self.layoutInsetsCalculator = layoutInsetsCalculator
         super.init(frame: .zero)
     }
@@ -53,8 +61,9 @@ public class SQLayoutView: UIView {
         self.init(layoutInsetsCalculator: { _ in layoutInsets })
     }
 
-    public convenience init() {
-        self.init(layoutInsets: .zero)
+    public init() {
+        self.layoutInsetsCalculator = { _ in .zero }
+        super.init(frame: .zero)
     }
 
     required init?(coder: NSCoder) {
@@ -67,8 +76,8 @@ public class SQLayoutView: UIView {
     /// Convenience factory method for creating an auto-sizing layoutView added as a subview to a parent view
     ///
     @discardableResult
-    public static func addAutosizedView(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero, ignoreTopAnchor: Bool = false) -> SQLayoutView {
-        let contentView = SQLayoutView(layoutInsets: layoutInsets)
+    public static func addAutosizedView(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero, ignoreTopAnchor: Bool = false, ignoreBottomAnchor: Bool = false) -> Self {
+        let contentView = Self.init(layoutInsetsCalculator:{ _ in layoutInsets })
 
         // Add content view as subview
         view.addSubview(contentView)
@@ -79,8 +88,10 @@ public class SQLayoutView: UIView {
             if !ignoreTopAnchor {
                 contentView.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
             }
+            if !ignoreBottomAnchor {
+                contentView.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
+            }
             NSLayoutConstraint.activate([
-                contentView.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor),
                 contentView.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor),
                 contentView.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor)
             ])
@@ -88,8 +99,10 @@ public class SQLayoutView: UIView {
             if !ignoreTopAnchor {
                 contentView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
             }
+            if !ignoreBottomAnchor {
+                contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            }
             NSLayoutConstraint.activate([
-                contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
                 contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
             ])
@@ -167,20 +180,26 @@ public class SQLayoutView: UIView {
     // MARK: - Public (Chaining support)
 
     @discardableResult
-    public func containingArrangedItem(_ item: any SQLayoutItem) -> SQLayoutView {
+    public func containingArrangedItem(_ item: any SQLayoutItem) -> Self {
         addArrangedItem(item)
         return self
     }
 
     @discardableResult
-    public func containingLayoutInsetsCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> SQLayoutView {
+    public func containingLayoutInsetsCalculator(_ c: @escaping SQLayoutViewInsetsCalculator) -> Self {
         layoutInsetsCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingLayoutInsets(_ insets: UIEdgeInsets) -> SQLayoutView {
+    public func containingLayoutInsets(_ insets: UIEdgeInsets) -> Self {
         return containingLayoutInsetsCalculator({ _ in insets })
+    }
+
+    @discardableResult
+    public func containingPointNeverInside(_ neverInside: Bool) -> Self {
+        isPointNeverInside = neverInside
+        return self
     }
 
     ///
@@ -188,7 +207,7 @@ public class SQLayoutView: UIView {
     /// a layout view created in a chain of ".containingXXX" methods
     ///
     @discardableResult
-    public func containingCustomization(_ customization: (SQLayoutView) -> Void) -> SQLayoutView {
+    public func containingCustomization(_ customization: (SQLayoutView) -> Void) -> Self {
         customization(self)
         return self
     }
@@ -203,80 +222,86 @@ public class SQLayoutView: UIView {
     ///
 
     @discardableResult
-    public func containingDefaultSizeCalculator(_ c: @escaping SQSizeCalculator) -> SQLayoutView {
+    public func containingDefaultSizeCalculator(_ c: @escaping SQSizeCalculator) -> Self {
         defaultSizeCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingDefaultSize(_ size: CGSize) -> SQLayoutView {
+    public func containingDefaultSize(_ size: CGSize) -> Self {
         defaultSizeCalculator = {_ in size }
         return self
     }
 
     @discardableResult
-    public func containingDefaultFrameCalculator(_ c: @escaping SQFrameCalculator) -> SQLayoutView {
+    public func containingDefaultFrameCalculator(_ c: @escaping SQFrameCalculator) -> Self {
         defaultFrameCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingDefaultFrame(_ frame: CGRect) -> SQLayoutView {
+    public func containingDefaultFrame(_ frame: CGRect) -> Self {
         defaultFrameCalculator = {_ in frame }
         return self
     }
 
     @discardableResult
-    public func containingDefaultSizingFrameCalculator(_ c: @escaping SQFrameCalculator) -> SQLayoutView {
+    public func containingDefaultSizingFrameCalculator(_ c: @escaping SQFrameCalculator) -> Self {
         defaultSizingFrameCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingDefaultSizingFrame(_ frame: CGRect) -> SQLayoutView {
+    public func containingDefaultSizingFrame(_ frame: CGRect) -> Self {
         defaultSizingFrameCalculator = {_ in frame }
         return self
     }
 
     @discardableResult
-    public func containingDefaultSpacingCalculator(_ c: @escaping SQSpacingCalculator) -> SQLayoutView {
+    public func containingDefaultSpacingCalculator(_ c: @escaping SQSpacingCalculator) -> Self {
         defaultSpacingCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingDefaultSpacing(_ spacing: UIEdgeInsets) -> SQLayoutView {
+    public func containingDefaultSpacing(_ spacing: UIEdgeInsets) -> Self {
         defaultSpacingCalculator = {_ in spacing }
         return self
     }
 
     @discardableResult
-    public func containingDefaultPaddingCalculator(_ c: @escaping SQPaddingCalculator) -> SQLayoutView {
+    public func containingDefaultPaddingCalculator(_ c: @escaping SQPaddingCalculator) -> Self {
         defaultPaddingCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingDefaultPadding(_ padding: UIEdgeInsets) -> SQLayoutView {
+    public func containingDefaultPadding(_ padding: UIEdgeInsets) -> Self {
         defaultPaddingCalculator = {_ in padding }
         return self
     }
 
     @discardableResult
-    public func containingDefaultLayoutOptionsCalculator(_ c: @escaping SQLayoutOptionsCalculator) -> SQLayoutView {
+    public func containingDefaultLayoutOptionsCalculator(_ c: @escaping SQLayoutOptionsCalculator) -> Self {
         defaultLayoutOptionsCalculator = c
         return self
     }
 
     @discardableResult
-    public func containingDefaultLayoutOptions(_ options: SQLayoutOptions) -> SQLayoutView {
+    public func containingDefaultLayoutOptions(_ options: SQLayoutOptions) -> Self {
         defaultLayoutOptionsCalculator = {_ in options }
         return self
     }
 
     @discardableResult
-    public func containingDefaultLayoutObserver(_ observer: @escaping SQLayoutObserver) -> SQLayoutView {
+    public func containingDefaultLayoutObserver(_ observer: @escaping SQLayoutObserver) -> Self {
         defaultLayoutObserver = observer
+        return self
+    }
+
+    @discardableResult
+    public func containingDidLayoutSubviewsCallback(_ callback: @escaping SQLayoutViewCallback) -> Self {
+        didLayoutSubviewsCallback = callback
         return self
     }
 
@@ -287,6 +312,8 @@ public class SQLayoutView: UIView {
 
         // Call container to layout subviews
         container.layoutItems(in: self.bounds, with: layoutInsets, forSizingOnly: false)
+
+        didLayoutSubviewsCallback?(self)
     }
 
     public override func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -317,6 +344,10 @@ public class SQLayoutView: UIView {
             }
         }
     }
+
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return isPointNeverInside ? false : super.point(inside: point, with: event)
+    }
 }
 
 ///
@@ -328,17 +359,7 @@ extension UIView {
 
     // MARK: - SQLayoutItem
     override public var sq_sizeCalculator: SQSizeCalculator? {
-        return (self.superview as? SQLayoutView)?.defaultSizeCalculator ?? { [weak self] args in
-            // Fix calculation of UILabel handle wrapping properly
-            if let label = args.item.sq_rootItem as? UILabel, let text = label.text, let font = label.font {
-                let maximumObservedLabelWidthRoundoff: CGFloat = 3
-                let size = text.boundingRect(with: args.fittingSize, options: [.usesLineFragmentOrigin], attributes: [.font: font], context: nil).size
-                return CGSizeMake(size.width+maximumObservedLabelWidthRoundoff, size.height)
-            }
-
-            // Override to default to sizeThatFits for size calculation
-            return self?.sizeThatFits(args.fittingSize) ?? .zero
-        }
+        return (self.superview as? SQLayoutView)?.defaultSizeCalculator ?? SQLayoutCalculators.viewSizeCalculator()
     }
 
     override public var sq_frameCalculator: SQFrameCalculator? {
