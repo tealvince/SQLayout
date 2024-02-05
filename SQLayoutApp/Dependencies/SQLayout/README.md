@@ -18,6 +18,7 @@ Sequential Layout isn't a typical layout "system" per-se, in that it does not de
 
 Typical layout code usually looks something like the following.  The views to layout are sized and laid out one at at time, with various running offsets carried forward to each successive view to allow views to accomodate each other.  While this works, the endless cycle of sizing, offsetting, and setting of each view's frame results tends to ends up with unmanageably long functions with a lot of duplicated, similar-looking code.
 
+```
     override func layoutSubviews() {
         super.layoutSubviews
 
@@ -31,6 +32,7 @@ Typical layout code usually looks something like the following.  The views to la
 
         ....
     }
+```
 
 With Sequential Layout views, a container wrapper view (SQLayoutView) contains and manages one or more arrangedItems.  It enumerates over its arranged subviews when layoutSubviews is called, but unlike other container-based layout methods, the logic resides with code associated with each subview, not with the container.
 
@@ -39,7 +41,7 @@ Instead, each arranged subview defines its own behavior based on "calculator" bl
 ## Example
 
 The following is a simple example of five subviews, two vertically stacked labels followed by three buttons laid out using a flow (reading order) layout:
-
+```
     let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
 
     contentView.addArrangedItem(self.titleLabel
@@ -71,9 +73,11 @@ The following is a simple example of five subviews, two vertically stacked label
    │  │   cancel   │            │
    │  └────────────┘            │
    └────────────────────────────┘
+```
 
 The code above is all that is needed to add views that layout in the content view and for the content view to calculate a size to fit its contents.  In fact, since containerLeftAlignedVStack is the default frame calculator, this can be simplified using an optional "chaining" methods in SQLayoutView into a single statement:
 
+```
     let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
         .containingArrangedItem(self.titleLabel)
         .containingArrangedItem(self.subtitleLabel)
@@ -83,6 +87,7 @@ The code above is all that is needed to add views that layout in the content vie
         )
         .containingArrangedItem(self.moreButton.withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow))
         .containingArrangedItem(self.cancelButton.withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow))
+```
 
 
 ## Benefits
@@ -131,6 +136,7 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
 
 ## Tutorial
 
+```
     // First, we create a layout view and add it as an autosized subview 
     // of our view.  We can do this manually, but here we use a convenience
     // method to create the layout view, add it as a subview, and set the 
@@ -171,9 +177,11 @@ Layout items (usually subviews) can be "decorated" by using a .withSQxxx() metho
    │                            │
    │        Footer Label        │
    └────────────────────────────┘
+```
 
 The code above is spaced out to describe each step individually.  Alternatively, we can use the containingArrangedItem() chaining method to simplify the above code. At the same time, let's say we want to space out the items vertically by 10 px, except for the space above the footer which we'll keep at 20.  We can do this with the containingDefaultSpacing() chaining method on the layoutView:
 
+```
     let layoutView = SQLayoutView.addAutosizedView(to: self.view, layoutInsets: .zero)
         .containingArrangedItem(titleLabel)
         .containingArrangedItem(subtitleLabel)
@@ -185,9 +193,11 @@ The code above is spaced out to describe each step individually.  Alternatively,
             .withSQSpacing(UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
         )
         .containingDefaultSpacing(UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+```
 
 Now let's say we want to support multiple action buttons, and have the row of them centered horizontally in the container view.  Since centering a group along the same axis we are adding them cannot be done sequentially, we can wrap the group in another layout view to accomplish this:
 
+```
     let layoutView = SQLayoutView.addAutosizedView(to: self.view, layoutInsets: .zero)
         .containingArrangedItem(titleLabel)
         .containingArrangedItem(subtitleLabel)
@@ -214,6 +224,7 @@ Now let's say we want to support multiple action buttons, and have the row of th
    │                            │
    │        Footer Label        │
    └────────────────────────────┘
+```
 
 Note that the "with...()" decorator methods can be applied to any layoutItem and determine their layout inside an enclosing layoutView, while the "containing...()" methods only apply to the layoutView containers themselves and set defaults for all layoutItems inside.  In this example, the buttons are wrapped by a layoutView that is itself also a layoutItem, so it has both "with..." and "containing..." methods called on it.
 
@@ -227,27 +238,35 @@ While this works for many use cases, it can break if the enclosed subviews can e
 
 To avoid support size calculation in the above case, one can optionally specify a different frame calculator for use only during sizing operations.  By keeping consistent alignment, automatic size calculation can still be used.  For example, consider a horizontal row of items that we want to be aligned by their vertical centers, but with one item that should be top-aligned:
 
+```
     let rowLayoutView = SQLayoutView()
         .containingArrangedItem(iconImageView)
         .containingArrangedItem(titleLabel)
         .containingArrangedItem(actionButton)
         .containingArrangedItem(badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack))
         .containingDefaultFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
+```
 
 In this case, the mixed top-aligned badge view and center-aligned other views would cause rowLayoutView to return a ridiculously tall height in response to rowLayoutView.sizeThatFits(CGSizeMake(CGFloat.max, CGFloat.max)).  To fix this, we can add the following line to use a top-aligned calculator when sizing items in the row, which will still give the correct height for the layout view equal to the height of the tallest arranged item:
 
+```
         .containingDefaultSizingFrameCalculator(SQLayoutCalculators.topAlignedHStack)
+```
 
 Another edge case can occur with decorative views that size automatically with the layout view.  For instance, if we add a background view that matches the container, the layoutView would always return the fittingSize passed into sizeThatFits:
 
+```
         .containingArrangedItem(backgroundView.withSQFrameCalculator(SQLayoutCalculators.matchContainer))
+```
 
 To avoid this, we can add a decorator to specify the option to ignore the view's frame during container sizing operations:
 
+```
         .containingArrangedItem(backgroundView
             .withSQFrameCalculator(SQLayoutCalculators.matchContainer)
             .withSQOptions(SQLayoutOptions(shouldIgnoreWhenCalculatingSize: true))
         )
+```
 
 ### Unpadding
 
@@ -257,20 +276,24 @@ A negative padding value can be used to ignore any whitespace built into an arra
 
 By default, views are laid out sequentially, with each view receiving the bounds of the previous one.  Sometimes, however, this is not useful.  For example, consider an avatar view that has a badge overlay in one corner.  It is natural to add the badge after the avatar view so it can size and layout relative to the avatar bounds, but it is unlikely that a view following the avatar would find the badge bounds to be useful.
 
+```
         .containingArrangedItem(avatarView)
         .containingArrangedItem(badgeIconView
             .withSQFrameCalculator(SQLayoutCalculators.topRightAligned)
         )
         .containingArrangedItem(usernameLabel) // appears on top of avatar instead of below it
+```
 
 While wrapping the avatar and badge together in a nested layoutView could be used to work around this, disabling the saveAsPrevious flag can also be used.  When set on an arranged item, the next view to be laid out sees the same "previous" value as the flagged view.
 
+```
         .containingArrangedItem(avatarView)
         .containingArrangedItem(badgeIconView
             .withSQFrameCalculator(SQLayoutCalculators.topRightAligned)
             .withSQOptions(SQLayoutOptions(saveAsPrevious: false))
         )
         .containingArrangedItem(usernameLabel) // is now positioned below avatar view
+```
 
 ### Non-view based layout
 
