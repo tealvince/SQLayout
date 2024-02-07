@@ -8,6 +8,7 @@
 
 import UIKit
 
+public typealias SQLayoutViewArrangedItemsBuilder = (SQLayoutView) -> [any SQLayoutItem]
 public typealias SQLayoutViewInsetsCalculator = (SQLayoutView) -> UIEdgeInsets
 public typealias SQLayoutViewCallback = (SQLayoutView) -> Void
 
@@ -38,6 +39,9 @@ public class SQLayoutView: UIView {
 
     /// Convenience property to add additional behavior after view is laid out, such as updating coordinating views
     public var didLayoutSubviewsCallback: SQLayoutViewCallback?
+
+    /// Convenience properties to define items using swift resultBuilder or callback
+    public var arrangedItemsBuilder: SQLayoutViewArrangedItemsBuilder?
 
     /// Default calculators for arranged items (if not specifically set by item decorator)
     public var defaultSizeCalculator: SQSizeCalculator?
@@ -79,35 +83,49 @@ public class SQLayoutView: UIView {
     public static func addAutosizedView(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero, ignoreTopAnchor: Bool = false, ignoreBottomAnchor: Bool = false) -> Self {
         let contentView = Self.init(layoutInsetsCalculator:{ _ in layoutInsets })
 
+        return contentView.addAutosized(to: view, layoutGuide: layoutGuide, layoutInsets: layoutInsets, ignoreTopAnchor: ignoreTopAnchor, ignoreBottomAnchor: ignoreBottomAnchor)
+    }
+
+    public func addAutosized(to view: UIView, layoutGuide: UILayoutGuide? = nil, layoutInsets: UIEdgeInsets = .zero, ignoreTopAnchor: Bool = false, ignoreBottomAnchor: Bool = false) -> Self {
+
         // Add content view as subview
-        view.addSubview(contentView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(self)
+        self.translatesAutoresizingMaskIntoConstraints = false
 
         // Set constraints
         if let layoutGuide = layoutGuide {
             if !ignoreTopAnchor {
-                contentView.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
+                self.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
             }
             if !ignoreBottomAnchor {
-                contentView.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
+                self.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
             }
             NSLayoutConstraint.activate([
-                contentView.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor),
-                contentView.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor)
+                self.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor),
+                self.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor)
             ])
         } else {
             if !ignoreTopAnchor {
-                contentView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+                self.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
             }
             if !ignoreBottomAnchor {
-                contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+                self.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
             }
             NSLayoutConstraint.activate([
-                contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+                self.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                self.trailingAnchor.constraint(equalTo: view.trailingAnchor)
             ])
         }
-        return contentView
+        return self
+    }
+
+    ///
+    /// Update arranged items with existing builder or provider
+    ///
+    public func buildArrangedItems() {
+        if let builder = arrangedItemsBuilder {
+            setArrangedItems(builder(self))
+        }
     }
 
     ///
@@ -182,6 +200,13 @@ public class SQLayoutView: UIView {
     @discardableResult
     public func containingArrangedItem(_ item: any SQLayoutItem) -> Self {
         addArrangedItem(item)
+        return self
+    }
+
+    @discardableResult
+    public func containingArrangedItemsBuilder(_ builder: SQLayoutViewArrangedItemsBuilder?) -> Self {
+        arrangedItemsBuilder = builder
+        buildArrangedItems()
         return self
     }
 
