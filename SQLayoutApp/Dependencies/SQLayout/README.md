@@ -297,9 +297,25 @@ While wrapping the avatar and badge together in a nested layoutView could be use
         .containingArrangedItem(usernameLabel) // is now positioned below avatar view
 ```
 
-### Result builder
+### Swift Result builders
 
-Sequential Layout views support an arrangedItemsBuilder property that can be used to define arranged items via a closure that is called when the property is set and subsequently if/whenever the buildArrangedItems() method is called.  The SQLayoutItemsBuilder result builder can be used to support a Swift-UI-like syntax for defining the arranged items via an external builder function:
+Sequential Layout views support an arrangedItemsBuilder property that can be used to define arranged items via a closure.  The closure is called when the property is first set and can be subsequently manually re-triggered, if needed, by a call to buildArrangedItems().  
+
+The SQLayoutItemsBuilder result-builder can be used to implement arrangedItemsBuilder, supporting a Swift-UI-like syntax for defining the arranged items in place of containingArrangedItems(), setArrangedItems(), and addArrangedItem().
+
+This can be done via an initializer result-builder argument:
+```
+    let rowLayoutView = SQLayoutView {
+        iconImageView
+        titleLabel
+        actionButton
+        badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack)
+    }
+    .containingDefaultFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
+```
+
+or broken out to an external builder function via containingArrangedItemsBuilder():
+    
 ```
     let rowLayoutView = SQLayoutView()
         .containingArrangedItemsBuilder(buildItems)
@@ -314,8 +330,8 @@ Sequential Layout views support an arrangedItemsBuilder property that can be use
         badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack)
     }
 ```
+Note that when specifying a result-builder, a reference to the builder is stored in the layout view, so one should be aware of retain loops and use "weak self" as needed when declaring arranged items from properties stored in self.
 
-A negative padding value can be used to ignore any whitespace built into an arranged subview when positioning it.  This is useful for views such as borderless text
 ### Non-view based layout
 
 The Sequential Layout framework and calculators can also be used to calculate frames for non-UIView objects.  This can be used, for instance, to precalculate subview frames to be stored in "layoutState" objects before the views themselves have even been created.  To do this, use any appropriate NSObject representing each rectangle as the items, and add them directly to an instance of SQLayoutContainer.  Each calculator will get a reference to the item in the sq_rootItem property.  Attach a "layoutObserver" to each object to store off the frame values whenever they are calculated during layout, and call layoutItems() to start the layout process.

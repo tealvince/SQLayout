@@ -41,7 +41,7 @@ public class SQLayoutView: UIView {
     public var didLayoutSubviewsCallback: SQLayoutViewCallback?
 
     /// Convenience properties to define items using swift resultBuilder or callback
-    public var arrangedItemsBuilder: SQLayoutViewArrangedItemsBuilder?
+    public var arrangedItemsBuilder: SQLayoutViewArrangedItemsBuilder? { didSet { buildArrangedItems() }}
 
     /// Default calculators for arranged items (if not specifically set by item decorator)
     public var defaultSizeCalculator: SQSizeCalculator?
@@ -63,6 +63,13 @@ public class SQLayoutView: UIView {
 
     public convenience init(layoutInsets: UIEdgeInsets = .zero) {
         self.init(layoutInsetsCalculator: { _ in layoutInsets })
+    }
+
+    // Set items with an inline result builder
+    public convenience init(@SQLayoutItemsBuilder builder: @escaping () -> [any SQLayoutItem]) {
+        self.init(layoutInsetsCalculator: { _ in .zero })
+        self.arrangedItemsBuilder = { _ in return builder() }
+        self.buildArrangedItems()
     }
 
     public init() {
@@ -206,7 +213,6 @@ public class SQLayoutView: UIView {
     @discardableResult
     public func containingArrangedItemsBuilder(_ builder: SQLayoutViewArrangedItemsBuilder?) -> Self {
         arrangedItemsBuilder = builder
-        buildArrangedItems()
         return self
     }
 
