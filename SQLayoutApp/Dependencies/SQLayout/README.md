@@ -4,7 +4,7 @@ Sequential Layout Views for iOS
 Vince Lee  
 
 Created: Feb 7, 2023  
-Updated: Feb 5, 2024
+Updated: Feb 7, 2024
 
 ## What it is
 
@@ -16,7 +16,7 @@ Sequential Layout isn't a typical layout "system" per-se, in that it does not de
 
 ## How it works
 
-Typical layout code usually looks something like the following.  The views to layout are sized and laid out one at at time, with various running offsets carried forward to each successive view to allow views to accomodate each other.  While this works, the endless cycle of sizing, offsetting, and setting of each view's frame results tends to ends up with unmanageably long functions with a lot of duplicated, similar-looking code.
+Typical traditional layout code usually looks something like the following.  The views to layout are sized and laid out one at at time, with various running offsets carried forward to each successive view to allow views to accomodate each other.  While this works, the endless cycle of sizing, offsetting, and setting of each view's frame results tends to ends up with unmanageably long functions with a lot of duplicated, similar-looking code.
 
 ```
     override func layoutSubviews() {
@@ -28,21 +28,25 @@ Typical layout code usually looks something like the following.  The views to la
 
         let titleSize = self.titleLabel.sizeThatFits(layoutBounds.size.width, CGFloat.max)
         self.titleLabel.frame = CGRectMake(x, y, titleSize.width, titleSize.height)
-        y += titleSize.height + 20
+        y += titleSize.height + 8
+
+        let subtitleSize = self.subtitleLabel.sizeThatFits(layoutBounds.size.width, CGFloat.max)
+        self.subtitleLabel.frame = CGRectMake(x, y, subtitleSize.width, subtitleSize.height)
+        y += subtitleSize.height + 20
 
         ....
     }
 ```
 
-With Sequential Layout views, a container wrapper view (SQLayoutView) contains and manages one or more arrangedItems.  It enumerates over its arranged subviews when layoutSubviews is called, but unlike other container-based layout methods, the logic resides with code associated with each subview, not with the container.
+With Sequential Layout views, a container wrapper view (SQLayoutView) contains and manages one or more arrangedItems.  It enumerates over its arranged subviews when layoutSubviews is called, but unlike other container-based layout methods, the logic resides with code associated with each subview, not hardcoded within the container.
 
-Instead, each arranged subview defines its own behavior based on "calculator" blocks that decorate it.  Note that calculator blocks are specified when a subview is added to the layout container view, and thus don't require subclassing or modifying the subviews themselves.  These calculators define the layout, sizing, spacing, and insets of each view.  Since each calculator is passed the information it needs in a modular way, the calculators are usually reusable and can often replaced with a set of premade standard calculators defined in SQLayoutCalculators.  They can still be defined with custom code, however, or made by composing existing calculators to handle unique edge cases.
+Instead, each arranged subview defines its own behavior based on "calculator" blocks that decorate it.  Note that calculator blocks are specified when a subview is added to the layout container view, and thus don't require subclassing or modifying the subviews themselves.  These calculators define the layout, sizing, spacing, and insets of each view.  Since each calculator is passed the information it needs in a modular way, the calculators are reusable and can often replaced with a set of premade standard calculators defined in SQLayoutCalculators.  They can still be defined with custom code, however, or made by composing existing calculators to handle unique edge cases.
 
 ## Example
 
 The following is a simple example of five subviews, two vertically stacked labels followed by three buttons laid out using a flow (reading order) layout:
 ```
-    let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
+    let contentView = SQLayoutView.addAutosizedView(to: view, layoutGuide: view.safeAreaLayoutGuide)
 
     contentView.addArrangedItem(self.titleLabel
         .withSQFrameCalculator(SQLayoutCalculators.containerLeftAlignedVStack)
@@ -78,7 +82,7 @@ The following is a simple example of five subviews, two vertically stacked label
 The code above is all that is needed to add views that layout in the content view and for the content view to calculate a size to fit its contents.  In fact, since containerLeftAlignedVStack is the default frame calculator, this can be simplified using an optional "chaining" methods in SQLayoutView into a single statement:
 
 ```
-    let contentView = SQLayoutView.contentView(addedTo: view, layoutGuide: view.safeAreaLayoutGuide)
+    let contentView = SQLayoutView.addAutosizedView(to: view, layoutGuide: view.safeAreaLayoutGuide)
         .containingArrangedItem(self.titleLabel)
         .containingArrangedItem(self.subtitleLabel)
         .containingArrangedItem(self.skipButton
@@ -89,6 +93,21 @@ The code above is all that is needed to add views that layout in the content vie
         .containingArrangedItem(self.cancelButton.withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow))
 ```
 
+In Swift, an advanced result-builder based format can also be used to skip the "containingArrangedItem" calls and support looping and conditionals within the declaration.  See advanced topic for more info.
+
+```
+    let contentView = SQLayoutView
+        .init { [weak self] in
+            self?.titleLabel
+            self?.subtitleLabel
+            self?.skipButton
+                .withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
+                .withSQSpacing(UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
+            self?.moreButton.withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
+            self?.cancelButton.withSQFrameCalculator(SQLayoutCalculators.topAlignedFlow)
+        }
+        .addAutosizedView(to: view, layoutGuide: view.safeAreaLayoutGuide)
+```
 
 ## Benefits
 
@@ -299,29 +318,43 @@ While wrapping the avatar and badge together in a nested layoutView could be use
 
 ### Swift Result builders
 
-Sequential Layout views support an arrangedItemsBuilder property that can be used to define arranged items via a closure.  The closure is called when the property is first set and can be subsequently manually re-triggered, if needed, by a call to buildArrangedItems().  
+Sequential Layout views support an arrangedItemsBuilder property that can be used to define arranged items via a closure.  The closure is called when the property is first set and can be subsequently manually re-triggered, if needed, by a call to buildArrangedItems().
 
 The SQLayoutItemsBuilder result-builder can be used to implement arrangedItemsBuilder, supporting a Swift-UI-like syntax for defining the arranged items in place of containingArrangedItems(), setArrangedItems(), and addArrangedItem().
 
-This can be done via an initializer result-builder argument:
+This can be done via an initializer that takes a result-builder argument.  Note that we explicitly call .init here to make the indentation look nice since we have trailing modifiers:
 ```
-    let rowLayoutView = SQLayoutView {
-        iconImageView
-        titleLabel
-        actionButton
-        badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack)
-    }
-    .containingDefaultFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
+    let rowLayoutView = SQLayoutView
+        .init {
+            iconImageView
+            titleLabel
+            actionButton
+            badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack)
+        }
+        .containingDefaultFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
 ```
 
-or broken out to an external builder function via containingArrangedItemsBuilder():
-    
+or added via the result-builder argument passed to the containingArrangedItemsResultBuilder() decorator:
+
+```
+    let rowLayoutView = SQLayoutView()
+        .containingDefaultFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
+        .containingArrangedItemsResultBuilder {
+            iconImageView
+            titleLabel
+            actionButton
+            badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack)
+        }
+```
+
+or broken out to an external result-builder function via the containingArrangedItemsBuilder() decorator:
+
 ```
     let rowLayoutView = SQLayoutView()
         .containingArrangedItemsBuilder(buildItems)
         .containingDefaultFrameCalculator(SQLayoutCalculators.centerAlignedHStack)
 
-    // Build items using result-builder syntax
+    // Declare items builder as a result-builder so we can use declarative syntax
     @SQLayoutItemsBuilder
     func buildItems(_ layoutView: SQLayoutView) -> [any SQLayoutItem] {
         iconImageView
@@ -330,7 +363,7 @@ or broken out to an external builder function via containingArrangedItemsBuilder
         badgeIconView.withSQFrameCalculator(SQLayoutCalculators.topAlignedHStack)
     }
 ```
-Note that when specifying a result-builder, a reference to the builder is stored in the layout view, so one should be aware of retain loops and use "weak self" as needed when declaring arranged items from properties stored in self.
+Note that when specifying a result-builder, a reference to the builder is stored in the layout view, so one should be aware of retain loops and use "weak self" as needed if declaring arranged items from properties stored in self.
 
 ### Non-view based layout
 

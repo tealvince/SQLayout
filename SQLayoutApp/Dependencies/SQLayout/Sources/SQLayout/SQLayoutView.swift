@@ -66,9 +66,10 @@ public class SQLayoutView: UIView {
     }
 
     // Set items with an inline result builder
-    public convenience init(@SQLayoutItemsBuilder builder: @escaping () -> [any SQLayoutItem]) {
+    public convenience init(@SQLayoutItemsBuilder resultBuilder: @escaping () -> [any SQLayoutItem]) {
+
         self.init(layoutInsetsCalculator: { _ in .zero })
-        self.arrangedItemsBuilder = { _ in return builder() }
+        self.arrangedItemsBuilder = { _ in resultBuilder() }
         self.buildArrangedItems()
     }
 
@@ -213,6 +214,12 @@ public class SQLayoutView: UIView {
     @discardableResult
     public func containingArrangedItemsBuilder(_ builder: SQLayoutViewArrangedItemsBuilder?) -> Self {
         arrangedItemsBuilder = builder
+        return self
+    }
+
+    @discardableResult
+    public func containingArrangedItemsResultBuilder( @SQLayoutItemsBuilder _ resultBuilder: @escaping () -> [any SQLayoutItem]) -> Self {
+        arrangedItemsBuilder = { _ in resultBuilder() }
         return self
     }
 
